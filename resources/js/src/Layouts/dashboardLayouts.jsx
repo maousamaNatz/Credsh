@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Sidebar from '@/components/sidebarDashboard';
 import NavbarDashboard from '@/components/navbarDashboard';
+import footerDashboard from '@/components/footerDashboard';
 export default function DashboardLayout({ children }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -18,6 +19,7 @@ export default function DashboardLayout({ children }) {
                     <div className="container mx-auto px-6 py-8">
                         {children}
                     </div>
+                    <footerDashboard />
                 </main>
             </div>
         </div>

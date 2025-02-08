@@ -1,15 +1,15 @@
 import React, { useState } from "react";
 import { Link, usePage, router } from '@inertiajs/react'
 import Dropdown, { DropdownItem } from "@/common/dropdown";
+import { IconMap, IconUtensils, IconCamera, IconMessage, IconCart } from '@/common/icons';
+import { SearchBar } from "@/common/search";
 
 export default function Navbar() {
   const { auth } = usePage().props;
   const { user } = auth;
   const [selectedLocation, setSelectedLocation] = useState("Jakarta");
-  const [searchQuery, setSearchQuery] = useState("");
   const [isDetecting, setIsDetecting] = useState(false);
 
-  // Membuat komponen trigger untuk dropdown
   const LocationTrigger = () => (
     <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-900">
       {isDetecting ? (
@@ -49,7 +49,6 @@ export default function Navbar() {
 
   return (
     <header className="w-full">
-      {/* Top Bar */}
       <div className="bg-gray-100 py-2 px-4">
         <div className="container mx-auto flex justify-between items-center text-sm">
           <div className="text-gray-600">
@@ -88,7 +87,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Navigation */}
       <div className="bg-white shadow-md">
         <div className="container mx-auto py-4 px-4">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
@@ -104,25 +102,33 @@ export default function Navbar() {
               </nav>
             </div>
 
-            {/* Search Bar */}
             <div className="w-full md:w-1/3">
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Cari vendor pernikahan..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:border-red-500"
-                />
-                <button className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-red-600">
-                  <i className="fas fa-search"></i>
-                </button>
-              </div>
+              <SearchBar />
             </div>
 
             <div className="flex items-center space-x-4">
-              <Link href="/cart" className="text-gray-600 hover:text-red-600 transition duration-300">
-                <i className="fas fa-shopping-cart text-xl"></i>
+              <Link
+                href="/cart"
+                className="text-gray-600 hover:text-red-600 transition duration-300 relative group"
+              >
+                <div className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                  <IconCart className="w-6 h-6" />
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium group-hover:scale-110 transition-transform">
+                    0
+                  </span>
+                </div>
+              </Link>
+
+              <Link
+                href="/messages"
+                className="text-gray-600 hover:text-red-600 transition duration-300 relative group"
+              >
+                <div className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                  <IconMessage className="w-6 h-6" />
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-medium group-hover:scale-110 transition-transform">
+                    0
+                  </span>
+                </div>
               </Link>
 
               {user ? (
@@ -155,21 +161,20 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Category Navigation */}
       <div className="bg-gray-50 border-t border-gray-200">
         <div className="container mx-auto py-3 px-4">
           <nav className="flex space-x-8 overflow-x-auto scrollbar-hide">
             <Link href="/venue" className="text-gray-600 hover:text-red-600 whitespace-nowrap transition duration-300 flex items-center">
-              <i className="fas fa-building mr-2"></i>Venue
+              <IconMap className="mr-2 w-4 h-4" />Venue
             </Link>
             <Link href="/catering" className="text-gray-600 hover:text-red-600 whitespace-nowrap transition duration-300 flex items-center">
-              <i className="fas fa-utensils mr-2"></i>Catering
+              <IconUtensils className="mr-2 w-4 h-4" />Catering
             </Link>
             <Link href="/decoration" className="text-gray-600 hover:text-red-600 whitespace-nowrap transition duration-300 flex items-center">
               <i className="fas fa-paint-brush mr-2"></i>Decoration
             </Link>
             <Link href="/photography" className="text-gray-600 hover:text-red-600 whitespace-nowrap transition duration-300 flex items-center">
-              <i className="fas fa-camera mr-2"></i>Photography
+              <IconCamera className="mr-2 w-4 h-4" />Photography
             </Link>
             <Link href="/makeup" className="text-gray-600 hover:text-red-600 whitespace-nowrap transition duration-300 flex items-center">
               <i className="fas fa-magic mr-2"></i>Makeup & Hair

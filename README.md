@@ -1,66 +1,208 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
-
 <p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
+<img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="WeddingApps Platform">
+<h1 align="center">Credsh</h1>
 </p>
 
-## About Laravel
+## Tentang Proyek
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+Platform manajemen vendor pernikahan terintegrasi yang menyediakan:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- 🎯 Pencarian vendor pernikahan (fotografi, katering, dekorasi) dengan sistem rekomendasi
+- 💳 Sistem booking dan pembayaran online terintegrasi midtrans
+- ✍️ Manajemen artikel dan konten pernikahan dengan editor WYSIWYG
+- 👨💻 Sistem role management tiga level (Admin, Vendor, Customer)
+- 📊 Laporan dan analisis transaksi real-time
+- 📱 Responsive design untuk semua perangkat
+- 🌐 Multi-language support (Indonesia & English)
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Fitur Utama
 
-## Learning Laravel
+### Untuk Pelanggan
+- 🛍️ Pencarian vendor dengan filter kategori, harga, rating, dan lokasi
+- ⭐ Sistem rating dan ulasan vendor
+- 📅 Kalender ketersediaan vendor real-time
+- 💌 Notifikasi email & SMS untuk transaksi
+- 📑 Riwayat transaksi dan invoice
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### Untuk Vendor
+- 📈 Dashboard manajemen pesanan
+- 🖼️ Galeri portfolio dan upload dokumen
+- 💰 Manajemen komisi dan penarikan dana
+- 📦 Manajemen paket layanan
+- 📆 Kalender manajemen jadwal
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### Untuk Admin
+- 🔐 Manajemen user dan approval vendor
+- 📝 Modul CMS untuk konten artikel
+- 🚨 Sistem monitoring transaksi mencurigakan
+- 📉 Analitik pertumbuhan bisnis
+- ⚙️ Konfigurasi sistem dan komisi
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Diagram Database
+```mermaid
+erDiagram
+    USER ||--o{ VENDOR : manages
+    USER ||--o{ BOOKING : makes
+    VENDOR ||--o{ BOOKING : has
+    VENDOR ||--o{ TRANSACTION : receives
+    BOOKING ||--o{ TRANSACTION : generates
+    USER ||--o{ ARTICLE : writes
+    VENDOR ||--o{ REVIEW : has
+    USER ||--o{ REVIEW : gives
+    
+    USER {
+        bigint id
+        string name
+        string email
+        string role
+        string phone
+        string avatar
+        string status
+        timestamp email_verified_at
+        string password
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    VENDOR {
+        bigint id
+        bigint user_id
+        string nama
+        string kategori
+        string lokasi
+        text deskripsi
+        decimal rating
+        string status
+        string dokumen
+        timestamp approved_at
+    }
+    
+    BOOKING {
+        bigint id
+        bigint vendor_id
+        bigint customer_id
+        date tanggal_acara
+        string paket
+        string status
+        decimal total_harga
+        text catatan
+    }
+    
+    TRANSACTION {
+        bigint id
+        bigint booking_id
+        string invoice
+        decimal amount
+        decimal komisi
+        string payment_method
+        string status
+        timestamp paid_at
+    }
+    
+    ARTICLE {
+        bigint id
+        bigint author_id
+        string judul
+        text konten
+        string gambar
+        string kategori
+        string status
+        timestamp published_at
+    }
+    
+    REVIEW {
+        bigint id
+        bigint vendor_id
+        bigint user_id
+        decimal rating
+        text komentar
+        timestamp created_at
+    }
+```
 
-## Laravel Sponsors
+## Instalasi
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. Clone repositori
+```bash
+git clone https://github.com/maousamanatz/weddingapps.git
+cd weddingapps
+```
 
-### Premium Partners
+2. Salin file env dan konfigurasi:
+```bash
+cp .env.example .env
+nano .env # Sesuaikan dengan setting database dan API keys
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+3. Install dependencies:
+```bash
+composer install
+npm install
+npm run build
+```
 
-## Contributing
+4. Generate key dan optimasi:
+```bash
+php artisan key:generate
+php artisan optimize:clear
+php artisan storage:link
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+5. Migrasi database dengan data dummy:
+```bash
+php artisan migrate --seed
+```
 
-## Code of Conduct
+6. Jalankan server development:
+```bash
+php artisan serve
+composer run dev
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## Environment Variables Penting
+```env
+APP_NAME=WeddingApps
+APP_ENV=local
+APP_DEBUG=true
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=weddingapps
+DB_USERNAME=root
+DB_PASSWORD=
 
-## Security Vulnerabilities
+MIDTRANS_SERVER_KEY=
+MIDTRANS_CLIENT_KEY=
+MIDTRANS_MERCHANT_ID=
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+MAIL_MAILER=smtp
+MAIL_HOST=mailhog
+MAIL_PORT=1025
+MAIL_USERNAME=null
+MAIL_PASSWORD=null
+MAIL_ENCRYPTION=null
 
-## License
+GOOGLE_MAPS_API_KEY=
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Teknologi Utama
+- **Backend**: Laravel Framework 11.41.3
+- **Frontend**: React + Inertia.js
+- **Database**: MySQL 8 (Relational Database)
+- **Payment Gateway**: -
+- **Search Engine**: -
+- **Session & Cache**: -
+- **Real-time Communication**: Laravel Echo + WebSockets
+
+## Kontribusi
+1. Fork repository
+2. Buat branch fitur (`git checkout -b fitur-baru`)
+3. Commit perubahan (`git commit -am 'Tambahkan fitur baru'`)
+4. Push ke branch (`git push origin fitur-baru`)
+5. Buat Pull Request
+
+## Dokumentasi API
+Lihat dokumentasi API lengkap di [API Documentation](https://documenter.getpostman.com/view/12345678/2sA3BXYZXY)
+
+## Lisensi
+MIT License © 2024 Maousamanatz
