@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Link, usePage } from '@inertiajs/react'
-import Dropdown from "@/common/dropdown";
+import { Link, usePage, router } from '@inertiajs/react'
+import Dropdown, { DropdownItem } from "@/common/dropdown";
 
 export default function Navbar() {
   const { auth } = usePage().props;
@@ -24,39 +24,28 @@ export default function Navbar() {
     </button>
   );
 
-  const locationItems = [
-    {
-      label: 'Deteksi Lokasi',
-      icon: <i className="fas fa-location-arrow mr-2" />,
-      onClick: async () => {
-        try {
-          setIsDetecting(true);
-          navigator.geolocation.getCurrentPosition(async (position) => {
-            const { latitude, longitude } = position.coords;
-            const response = await fetch(
-              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
-            );
-            const data = await response.json();
-            const city = data.address.city || data.address.province;
-            setSelectedLocation(city);
-            setIsDetecting(false);
-          });
-        } catch (error) {
-          console.error('Gagal mendeteksi lokasi:', error);
-          setIsDetecting(false);
-        }
-      }
-    },
-    ...(user?.role === 'vendor' ? [{
-      label: 'Dashboard',
-      value: 'Dashboard',
-      icon: <i className="fas fa-chart-line mr-2" />
-    }] : []),
-    { label: 'Jakarta', value: 'Jakarta', icon: <i className="fas fa-building mr-2" /> },
-    { label: 'Bandung', value: 'Bandung', icon: <i className="fas fa-building mr-2" /> },
-    { label: 'Surabaya', value: 'Surabaya', icon: <i className="fas fa-building mr-2" /> },
-    { label: 'Bali', value: 'Bali', icon: <i className="fas fa-umbrella-beach mr-2" /> }
-  ];
+  const handleLocationDetect = async () => {
+    try {
+      setIsDetecting(true);
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { latitude, longitude } = position.coords;
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+        );
+        const data = await response.json();
+        const city = data.address.city || data.address.province;
+        setSelectedLocation(city);
+        setIsDetecting(false);
+      });
+    } catch (error) {
+      console.error('Gagal mendeteksi lokasi:', error);
+      setIsDetecting(false);
+    }
+  };
+
+  const handleLogout = () => {
+    router.post(route('logout'));
+  };
 
   return (
     <header className="w-full">
@@ -67,11 +56,34 @@ export default function Navbar() {
             © {new Date().getFullYear()} Natzsixn. All rights reserved.
           </div>
           <div className="flex items-center space-x-4">
-            <Dropdown
-              trigger={<LocationTrigger />}
-              items={locationItems}
-              onSelect={(item) => !item.onClick && setSelectedLocation(item.value)}
-            />
+            <Dropdown trigger={<LocationTrigger />}>
+              <DropdownItem onClick={handleLocationDetect}>
+                <i className="fas fa-location-arrow mr-2" />
+                Deteksi Lokasi
+              </DropdownItem>
+              {user?.role === 'vendor' && (
+                <DropdownItem onClick={() => setSelectedLocation('Dashboard')}>
+                  <i className="fas fa-chart-line mr-2" />
+                  Dashboard
+                </DropdownItem>
+              )}
+              <DropdownItem onClick={() => setSelectedLocation('Jakarta')}>
+                <i className="fas fa-building mr-2" />
+                Jakarta
+              </DropdownItem>
+              <DropdownItem onClick={() => setSelectedLocation('Bandung')}>
+                <i className="fas fa-building mr-2" />
+                Bandung
+              </DropdownItem>
+              <DropdownItem onClick={() => setSelectedLocation('Surabaya')}>
+                <i className="fas fa-building mr-2" />
+                Surabaya
+              </DropdownItem>
+              <DropdownItem onClick={() => setSelectedLocation('Bali')}>
+                <i className="fas fa-umbrella-beach mr-2" />
+                Bali
+              </DropdownItem>
+            </Dropdown>
           </div>
         </div>
       </div>
@@ -116,33 +128,22 @@ export default function Navbar() {
               {user ? (
                 <Dropdown
                   trigger={
-                    <button className="flex items-center space-x-2">
-                      <span className="text-gray-600">{user.name}</span>
-                      <i className="fas fa-chevron-down text-sm text-gray-600"></i>
+                    <button className="flex text-sm border-2 border-transparent rounded-full focus:outline-none">
+                      <img
+                        className="h-8 w-8 rounded-full"
+                        src={user.profile_photo_url}
+                        alt={user.name}
+                      />
                     </button>
                   }
-                  items={[
-                    ...(user.role === 'admin' ? [
-                      {
-                        label: 'Dashboard',
-                        icon: <i className="fas fa-tachometer-alt"></i>,
-                        onClick: () => window.location.href = '/dashboard'
-                      }
-                    ] : []),
-                    {
-                      label: 'Profile',
-                      icon: <i className="fas fa-user"></i>,
-                      onClick: () => window.location.href = '/profile'
-                    },
-                    {
-                      label: 'Logout',
-                      icon: <i className="fas fa-sign-out-alt"></i>,
-                      onClick: () => window.location.href = '/logout'
-                    }
-                  ]}
-                  align="right"
-                  type="profile"
-                />
+                >
+                  <DropdownItem onClick={() => window.location.href = route('profile.edit')}>
+                    Profil
+                  </DropdownItem>
+                  <DropdownItem onClick={handleLogout}>
+                    Logout
+                  </DropdownItem>
+                </Dropdown>
               ) : (
                 <div className="flex items-center space-x-4">
                   <Link href="/login" className="text-gray-600 hover:text-red-600 transition duration-300">Login</Link>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { VendorCard } from "@/common/card";
+import { Card } from "@/common/card";
 
 const ReloadCard = ({ items, itemsPerLoad = 8 }) => {
     const [displayedItems, setDisplayedItems] = useState([]);
@@ -39,23 +39,21 @@ const ReloadCard = ({ items, itemsPerLoad = 8 }) => {
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {displayedItems.map((vendor, index) => (
-                <VendorCard
+            {displayedItems.map((item, index) => (
+                <Card
                     key={index}
-                    vendor={{
-                        id: vendor.id,
-                        nama: vendor.nama,
-                        gambar: vendor.gambar,
-                        kategori: vendor.kategori,
-                        rating: vendor.rating,
-                        reviews: vendor.reviews,
-                        harga_mulai: vendor.harga_mulai
-                    }}
+                    image={item.image}
+                    title={item.title}
+                    price={item.price}
+                    rating={item.rating}
+                    location={item.location}
+                    category={item.category}
+                    description={item.description}
                 />
             ))}
             {currentIndex < items.length && (
                 <div className="col-span-full text-center py-4">
-                    <img src="/images/loading.gif" alt="Loading" className="w-12 h-12 mx-auto" />
+                    <div className="animate-spin inline-block w-8 h-8 border-4 border-red-600 border-t-transparent rounded-full"></div>
                 </div>
             )}
         </div>

@@ -6,28 +6,28 @@ use App\Models\User;
 use Inertia\Inertia;
 use App\Models\Report;
 use App\Models\Vendor;
+use App\Models\Booking;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
 {
+
+
     // Dashboard Admin
     public function dashboard()
     {
-        $reportsData = Report::with(['reporter', 'reportedUser'])
-            ->latest()
-            ->limit(5)
-            ->get()
-            ->toArray();
+        $stats = [
+            'total_bookings' => Booking::count(),
+            'active_vendors' => Vendor::whereHas('user', function($query) {
+                $query->where('role', 'vendor')
+                      ->where('users.id', auth()->id());
+            })->count(),
+            'revenue' => Transaction::sum('amount')
+        ];
 
-        return Inertia::render('admin/Dashboard', [
-            'stats' => [
-                'total_users' => User::count(),
-                'total_vendors' => Vendor::count(),
-                'total_transactions' => Transaction::sum('amount'),
-                'open_reports' => Report::where('status', '!=', 'resolved')->count()
-            ],
-            'recentReports' => $reportsData
+        return Inertia::render('Dashboard', [
+            'stats' => $stats
         ]);
     }
 

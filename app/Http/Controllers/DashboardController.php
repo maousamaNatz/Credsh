@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
-use App\Models\Booking;
 use App\Models\Vendor;
+use App\Models\Booking;
 
 class DashboardController extends Controller
 {
@@ -18,4 +18,4 @@ class DashboardController extends Controller
             ]
         ]);
     }
-} 
+}

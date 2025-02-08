@@ -1,7 +1,7 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
-import { Card } from "../common/config";
+import { Card } from "@/common/card";
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/navigation";

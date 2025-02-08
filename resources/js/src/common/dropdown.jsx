@@ -3,88 +3,31 @@ import PropTypes from 'prop-types';
 
 const Dropdown = ({
   trigger,
-  items,
+  children,
   align = 'left',
   className = '',
-  onSelect,
-  type = 'default', // 'default', 'profile', 'big', 'multi'
-  subItems
+  width = 'w-56',
+  onClose
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [activeSubmenu, setActiveSubmenu] = useState(null);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsOpen(false);
-        setActiveSubmenu(null);
+        onClose?.();
       }
     };
 
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const handleSelect = (item) => {
-    if (!item.subItems) {
-      onSelect?.(item);
-      setIsOpen(false);
-      setActiveSubmenu(null);
-    }
-  };
-
-  const handleSubmenuClick = (index) => {
-    setActiveSubmenu(activeSubmenu === index ? null : index);
-  };
+  }, [onClose]);
 
   const alignmentClasses = {
     left: 'left-0',
     right: 'right-0',
     center: 'left-1/2 transform -translate-x-1/2'
-  };
-
-  const getDropdownClasses = () => {
-    switch(type) {
-      case 'profile':
-        return 'w-64 bg-white rounded-lg shadow-xl border border-gray-200';
-      case 'big':
-        return 'w-96 bg-white rounded-lg shadow-xl border border-gray-200 p-4';
-      case 'multi':
-        return 'w-72 bg-white rounded-lg shadow-xl border border-gray-200';
-      default:
-        return 'w-56 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5';
-    }
-  };
-
-  const renderDropdownItems = (items) => {
-    return items.map((item, index) => {
-      if (item.type === 'profile') {
-        return (
-          <div key={index} className="px-4 py-3">
-            <p className="text-sm">{item.name}</p>
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {item.email}
-            </p>
-          </div>
-        );
-      }
-
-      if (item.type === 'divider') {
-        return <hr key={index} className="border-gray-200" />;
-      }
-
-      return (
-        <a
-          key={index}
-          href={item.href}
-          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          onClick={item.onClick}
-        >
-          {item.label}
-        </a>
-      );
-    });
   };
 
   return (
@@ -94,34 +37,54 @@ const Dropdown = ({
       </div>
 
       {isOpen && (
-        <div className={`absolute mt-2 z-50 ${alignmentClasses[align]} ${getDropdownClasses()}`}>
-          {renderDropdownItems(items)}
+        <div className={`absolute mt-2 z-50 ${alignmentClasses[align]} ${width} bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5`}>
+          {children}
         </div>
       )}
     </div>
   );
 };
 
+// Komponen tambahan untuk memudahkan penggunaan
+export const DropdownItem = ({ children, onClick, className = '', disabled = false }) => (
+  <button
+    onClick={onClick}
+    disabled={disabled}
+    className={`w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+  >
+    {children}
+  </button>
+);
+
+export const DropdownDivider = () => (
+  <hr className="my-1 border-gray-200" />
+);
+
+export const DropdownHeader = ({ children, className = '' }) => (
+  <div className={`px-4 py-2 text-xs font-semibold text-gray-500 uppercase ${className}`}>
+    {children}
+  </div>
+);
+
 Dropdown.propTypes = {
   trigger: PropTypes.node.isRequired,
-  items: PropTypes.oneOfType([
-    PropTypes.arrayOf(PropTypes.shape({
-      label: PropTypes.string.isRequired,
-      icon: PropTypes.node,
-      disabled: PropTypes.bool,
-      onClick: PropTypes.func,
-      subItems: PropTypes.array
-    })),
-    PropTypes.shape({
-      name: PropTypes.string,
-      email: PropTypes.string,
-      avatar: PropTypes.string
-    })
-  ]).isRequired,
+  children: PropTypes.node.isRequired,
   align: PropTypes.oneOf(['left', 'right', 'center']),
   className: PropTypes.string,
-  onSelect: PropTypes.func,
-  type: PropTypes.oneOf(['default', 'profile', 'big', 'multi'])
+  width: PropTypes.string,
+  onClose: PropTypes.func
+};
+
+DropdownItem.propTypes = {
+  children: PropTypes.node.isRequired,
+  onClick: PropTypes.func,
+  className: PropTypes.string,
+  disabled: PropTypes.bool
+};
+
+DropdownHeader.propTypes = {
+  children: PropTypes.node.isRequired,
+  className: PropTypes.string
 };
 
 export default Dropdown;
