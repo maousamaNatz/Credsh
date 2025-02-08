@@ -155,7 +155,6 @@ php artisan migrate --seed
 
 6. Jalankan server development:
 ```bash
-php artisan serve
 composer run dev
 ```
 
