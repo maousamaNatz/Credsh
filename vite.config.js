@@ -1,18 +1,25 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import laravel from "laravel-vite-plugin";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
     plugins: [
         laravel({
-            input: ['resources/js/app.jsx'],
+            input: [
+                "resources/js/app.jsx",
+                'resources/js/src/pages/**/*.jsx'
+            ],
             refresh: true,
         }),
         react(),
     ],
     resolve: {
         alias: {
-            '@': '/resources/js/src',
+            "@": "/resources/js/src",
+            "@/common": "/resources/js/src/common",
+            "@/data": "/resources/js/src/data",
+            "@/components": "/resources/js/src/components",
+            "@/Layouts": "/resources/js/src/Layouts",
         },
     },
 });

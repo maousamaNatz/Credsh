@@ -41,6 +41,21 @@ return new class extends Migration
             $table->longText('payload');
             $table->integer('last_activity')->index();
         });
+
+        Schema::create('reports', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('reporter_id')->constrained('users');
+            $table->foreignId('reported_id')->constrained('users');
+            $table->string('type'); // ['user', 'vendor', 'content']
+            $table->text('description');
+            $table->string('status')->default('pending'); // ['pending', 'investigating', 'resolved']
+            $table->text('resolution')->nullable();
+            $table->timestamps();
+
+            // Indexes
+            $table->index('status');
+            $table->index('reported_id');
+        });
     }
 
     /**
@@ -51,5 +66,6 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+        Schema::dropIfExists('reports');
     }
 };

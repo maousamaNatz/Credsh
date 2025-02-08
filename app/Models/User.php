@@ -27,6 +27,7 @@ class User extends Authenticatable
         'role',
         'last_login',
         'vendor_details',
+        'email_verified_at'
     ];
     protected $casts = [
         'email_verified_at' => 'datetime',
@@ -66,6 +67,11 @@ class User extends Authenticatable
         return $this->hasMany(Booking::class, 'customer_id');
     }
 
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class);
+    }
+
     public function isAdmin()
     {
         return $this->role === 'admin';
@@ -79,5 +85,26 @@ class User extends Authenticatable
     public function isCustomer()
     {
         return $this->role === 'customer';
+    }
+
+    /**
+     * Check if user has specific role
+     *
+     * @param string $role
+     * @return bool
+     */
+    public function hasRole(string $role): bool
+    {
+        return $this->role === $role;
+    }
+
+    public function vendorProfile()
+    {
+        return $this->hasOne(Vendor::class);
+    }
+
+    public function reports()
+    {
+        return $this->hasMany(Report::class);
     }
 }

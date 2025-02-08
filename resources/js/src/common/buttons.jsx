@@ -1,51 +1,34 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 
-export const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-  const variants = {
-    primary: 'bg-pink-500 text-white hover:bg-pink-600',
-    secondary: 'bg-gray-800 text-white hover:bg-gray-900',
-    outline: 'border-2 border-pink-500 text-pink-500 hover:bg-pink-50'
-  };
-
-  return (
+export const Button = ({ children, ...props }) => (
     <button
-      className={`px-6 py-3 rounded-lg font-medium transition-colors ${variants[variant]} ${className}`}
-      {...props}
+        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+        {...props}
     >
-      {children}
+        {children}
     </button>
-  );
-};
+);
 
-export const LinkButton = ({ children, href, variant = 'primary', className = '', ...props }) => {
-  const variants = {
-    primary: 'bg-pink-500 text-white hover:bg-pink-600',
-    secondary: 'bg-gray-800 text-white hover:bg-gray-900',
-    outline: 'border-2 border-pink-500 text-pink-500 hover:bg-pink-50'
-  };
-
-  return (
+export const LinkButton = ({ href, children, ...props }) => (
     <Link
-      href={href}
-      className={`inline-flex items-center justify-center px-6 py-3 rounded-lg font-medium transition-colors ${variants[variant]} ${className}`}
-      {...props}
+        href={href}
+        className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300 transition-colors"
+        {...props}
     >
-      {children}
+        {children}
     </Link>
-  );
-};
+);
 
-export const Links = ({ children, href, className = '', ...props }) => {
-  return (
+export const Links = ({ href, children }) => (
     <Link
-      href={href}
-      className={`inline-flex items-center transition-colors hover:text-pink-600 ${className}`}
-      {...props}
+        href={href}
+        className="text-blue-500 hover:text-blue-600 transition-colors"
     >
-      {children}
+        {children}
     </Link>
-  );
-};
+);
+
+export { Link } from '@inertiajs/react';
 
 

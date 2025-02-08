@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@font-face {
+    font-family: 'agraham';
+    src: url('/font/Agraham.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'brillant';
+    src: url('/font/brillant.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'dalton';
+    src: url('/font/Dalton White.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'gillie';
+    src: url('/font/Gillie Quest-Regular.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'gagliane';
+    src: url('/font/La Gagliane.otf') format('opentype');
+}
+
+@font-face {
+    font-family: 'wasted';
+    src: url('/font/Wasted-Vindey.ttf') format('truetype');
+}
