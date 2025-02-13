@@ -12,14 +12,21 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'nama',
-        'alamat',
         'deskripsi',
-        'latitude',
-        'longitude',
-        'harga_mulai',
-        'status',
+        'alamat',
+        'negara',
+        'kode_pos',
+        'telepon',
+        'nama_manager',
         'gambar',
-        'rating'
+        'status',
+        'kategori',
+        'lokasi'
+    ];
+
+    protected $casts = [
+        'portfolio' => 'array',
+        'bank_account' => 'array'
     ];
 
     public function user()
@@ -30,5 +37,15 @@ class Vendor extends Model
     public function bookings()
     {
         return $this->hasMany(Booking::class);
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    public function getGambarUrlAttribute()
+    {
+        return $this->gambar ? asset('storage/'.$this->gambar) : asset('images/default-vendor.jpg');
     }
 }

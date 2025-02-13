@@ -28,7 +28,8 @@ const CardCarousel = ({
             slidesPerView: 4,
         },
     },
-    className = "py-8"
+    className = "py-8",
+    jsx = "true"
 }) => {
     const renderCard = (item) => {
         switch(type) {

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\Vendor;
+use App\Models\Article;
 use Illuminate\Http\Request;
 
 class MainController extends Controller

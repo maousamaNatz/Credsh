@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
@@ -106,5 +107,18 @@ class User extends Authenticatable
     public function reports()
     {
         return $this->hasMany(Report::class);
+    }
+
+    public function notifications()
+    {
+        return $this->morphMany(DatabaseNotification::class, 'notifiable')
+            ->orderBy('created_at', 'desc');
+    }
+
+    public function getAvatarUrlAttribute()
+    {
+        return $this->avatar
+            ? asset('storage/' . $this->avatar)
+            : asset('images/default-avatar.png');
     }
 }

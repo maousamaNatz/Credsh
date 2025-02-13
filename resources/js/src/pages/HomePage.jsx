@@ -5,7 +5,7 @@ import CardCarousel from '@/components/carousel';
 import ReloadCard from '@/components/reloadCard';
 import MapComponent from '@/components/leaflet';
 import { VideoWithFallback } from '@/components/video';
-
+// import { BellIcons } from '@/common/icons';
 export default function HomePage({
      popularVendors, latestArticles,
 }) {
@@ -36,7 +36,7 @@ export default function HomePage({
 
                 <div className="relative container mx-auto px-4 h-full flex items-center justify-center md:justify-start">
                     <div className="text-white max-w-2xl text-center md:text-left px-4 md:px-0">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-gagliane mb-4 md:mb-6">
+                        <h1 className="text-3xl                            sm:text-4xl md:text-5xl lg:text-6xl font-gagliane mb-4 md:mb-6">
                             Wujudkan Pernikahan Impianmu
                         </h1>
                         <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8">

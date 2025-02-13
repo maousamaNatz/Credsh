@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Models\User;
 use Inertia\Inertia;
 use Inertia\Response;
+use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rules;
 use App\Http\Controllers\Controller;
@@ -34,13 +35,26 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'role' => 'required|in:vendor,customer'
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'role' => $request->role
         ]);
+
+        if($request->role === 'vendor') {
+            Vendor::create([
+                'user_id' => $user->id,
+                'nama' => $request->name . ' Wedding Services',
+                'alamat' => 'Alamat belum diisi',
+                'status' => 'draft',
+                'kategori' => 'umum',
+                'lokasi' => 'Jakarta'
+            ]);
+        }
 
         event(new Registered($user));
 

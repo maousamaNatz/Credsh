@@ -7,6 +7,8 @@ use App\Http\Controllers\MainController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\VendorController;
+use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -68,5 +70,40 @@ Route::middleware('auth')->group(function () {
         ->name('logout');
 });
 
+// Untuk semua user
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show'])
+        ->middleware('role:admin,vendor,customer')
+        ->name('profile');
+
+    // Route khusus admin
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+    });
+
+    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/vendor/setup', [ProfileController::class, 'setupVendorProfile'])->name('vendor.setup');
+});
+
+// Khusus vendor
+Route::middleware(['auth', 'role:vendor'])->group(function () {
+    Route::get('/vendor/dashboard', [VendorController::class, 'dashboard']);
+});
+
+// Khusus customer
+Route::middleware(['auth', 'role:customer'])->group(function () {
+    Route::get('/my-bookings', [BookingController::class, 'index']);
+});
+
+Route::middleware('auth')->group(function () {
+    // Profile routes
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
+
+    // Vendor product routes
+    Route::post('/profile/products', [ProfileController::class, 'storeProduct'])->name('products.store');
+    Route::put('/profile/products/{product}', [ProfileController::class, 'updateProduct'])->name('products.update');
+    Route::delete('/profile/products/{product}', [ProfileController::class, 'destroyProduct'])->name('products.destroy');
+});
 
 require __DIR__ . '/auth.php';
