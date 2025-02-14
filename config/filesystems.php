@@ -32,10 +32,8 @@ return [
 
         'local' => [
             'driver' => 'local',
-            'root' => storage_path('app/private'),
-            'serve' => true,
+            'root' => storage_path('app'),
             'throw' => false,
-            'report' => false,
         ],
 
         'public' => [
@@ -44,7 +42,27 @@ return [
             'url' => env('APP_URL').'/storage',
             'visibility' => 'public',
             'throw' => false,
-            'report' => false,
+        ],
+
+        'vendors' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/vendors'),
+            'url' => env('APP_URL').'/storage/vendors',
+            'visibility' => 'public',
+        ],
+
+        'avatars' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/avatars'),
+            'url' => env('APP_URL').'/storage/avatars',
+            'visibility' => 'public',
+        ],
+
+        'documents' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/documents'),
+            'url' => env('APP_URL').'/storage/documents',
+            'visibility' => 'public',
         ],
 
         's3' => [

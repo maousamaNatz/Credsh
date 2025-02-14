@@ -117,8 +117,11 @@ class User extends Authenticatable
 
     public function getAvatarUrlAttribute()
     {
-        return $this->avatar
-            ? asset('storage/' . $this->avatar)
-            : asset('images/default-avatar.png');
+        return $this->avatar ? asset("storage/{$this->avatar}") : null;
+    }
+
+    public function getDocumentUrlAttribute()
+    {
+        return $this->document_path ? asset("storage/{$this->document_path}") : null;
     }
 }
