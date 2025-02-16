@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Head } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react';
 import MainLayout from '@/Layouts/Layout';
+import React from 'react';
 
 export default function VendorProfile({ user, vendor, auth, notifications, flash }) {
     const { data, setData, post, processing, errors } = useForm({
@@ -10,11 +11,11 @@ export default function VendorProfile({ user, vendor, auth, notifications, flash
         phone: user.phone || '',
         avatar: null,
         vendor: {
-            nama: vendor.nama,
-            alamat: vendor.alamat,
-            kategori: vendor.kategori,
-            lokasi: vendor.lokasi,
-            deskripsi: vendor.deskripsi || '',
+            nama: vendor?.nama,
+            alamat: vendor?.alamat,
+            kategori: vendor?.kategori,
+            lokasi: vendor?.lokasi,
+            deskripsi: vendor?.deskripsi || '',
         }
     });
 
@@ -24,6 +25,15 @@ export default function VendorProfile({ user, vendor, auth, notifications, flash
             preserveScroll: true,
         });
     };
+
+    if (!vendor) {
+        return (
+            <div>
+                <h1>Profil Vendor</h1>
+                <p>Data vendor belum lengkap. Silakan lengkapi data vendor Anda.</p>
+            </div>
+        );
+    }
 
     return (
         <MainLayout auth={auth} notifications={notifications} flash={flash}>

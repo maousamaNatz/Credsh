@@ -78,7 +78,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // Route khusus admin
     Route::middleware('role:admin')->group(function () {
-        Route::get('/admin/dashboard', [AdminController::class, 'dashboard']);
+        Route::get('/admin/dashboard', [AdminController::class, 'dashboard'])
+            ->name('admin.dashboard')
+            ->middleware('admin');
     });
 
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -104,6 +106,29 @@ Route::middleware('auth')->group(function () {
     Route::post('/profile/products', [ProfileController::class, 'storeProduct'])->name('products.store');
     Route::put('/profile/products/{product}', [ProfileController::class, 'updateProduct'])->name('products.update');
     Route::delete('/profile/products/{product}', [ProfileController::class, 'destroyProduct'])->name('products.destroy');
+});
+
+// Admin Routes
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('admin.dashboard');
+
+    // Users Management
+    Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::put('/users/{user}', [AdminController::class, 'updateUser'])->name('admin.users.update');
+    Route::delete('/users/{user}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+
+    // Vendors Management
+    Route::get('/vendors', [AdminController::class, 'vendors'])->name('admin.vendors');
+    Route::put('/vendors/{vendor}', [AdminController::class, 'updateVendor'])->name('admin.vendors.update');
+    Route::delete('/vendors/{vendor}', [AdminController::class, 'deleteVendor'])->name('admin.vendors.delete');
+
+    // Transactions Management
+    Route::get('/transactions', [AdminController::class, 'transactions'])->name('admin.transactions');
+    Route::put('/transactions/{transaction}', [AdminController::class, 'updateTransaction'])->name('admin.transactions.update');
+
+    // Reports Management
+    Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::put('/reports/{report}', [AdminController::class, 'updateReport'])->name('admin.reports.update');
 });
 
 require __DIR__ . '/auth.php';

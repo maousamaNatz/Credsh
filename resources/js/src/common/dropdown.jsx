@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
+import { ChevronDown } from 'lucide-react';
 
-const Dropdown = ({
+function Dropdown({
+  title,
   trigger,
   children,
   align = 'left',
   className = '',
   width = 'w-56',
-  onClose
-}) => {
+  onClose,
+  type = 'default'
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -31,19 +34,20 @@ const Dropdown = ({
   };
 
   return (
-    <div className={`relative inline-block text-left ${className}`} ref={dropdownRef}>
+    <div className={`relative inline-block text-left ${className} dropdown dropdown-${align} dropdown-${type}`} ref={dropdownRef}>
       <div onClick={() => setIsOpen(!isOpen)}>
         {trigger}
       </div>
 
       {isOpen && (
         <div className={`absolute mt-2 z-50 ${alignmentClasses[align]} ${width} bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5`}>
-          {children}
+          {title && <div className="dropdown-header">{title}</div>}
+          {children || <div className="p-2">No items</div>}
         </div>
       )}
     </div>
   );
-};
+}
 
 // Komponen tambahan untuk memudahkan penggunaan
 export const DropdownItem = ({ children, onClick, className = '', disabled = false }) => (
@@ -67,12 +71,14 @@ export const DropdownHeader = ({ children, className = '' }) => (
 );
 
 Dropdown.propTypes = {
+  title: PropTypes.string,
   trigger: PropTypes.node.isRequired,
-  children: PropTypes.node.isRequired,
+  children: PropTypes.node,
   align: PropTypes.oneOf(['left', 'right', 'center']),
   className: PropTypes.string,
   width: PropTypes.string,
-  onClose: PropTypes.func
+  onClose: PropTypes.func,
+  type: PropTypes.string
 };
 
 DropdownItem.propTypes = {

@@ -21,15 +21,15 @@ class ProfileController extends Controller
             'user' => $user,
         ];
 
-        // Tambahan data untuk vendor
+        // Jika user bertipe vendor, ambil data vendor terkait
         if ($user->role === 'vendor') {
             $vendor = Vendor::where('user_id', $user->id)->first();
             $data['vendor'] = $vendor;
         }
 
-        // Menentukan view berdasarkan role
+        // Tentukan view berdasarkan role user
         $view = match($user->role) {
-            'admin' => 'profile.AdminProfile',    // Ubah format path menggunakan titik
+            'admin' => 'profile.AdminProfile',
             'vendor' => 'profile.VendorProfile',
             'customer' => 'profile.CustomerProfile',
             default => 'profile.CustomerProfile',
