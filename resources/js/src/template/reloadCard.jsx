@@ -1,59 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { VendorCard } from "@/common/card";
+import React, { useState, useEffect, useCallback } from 'react';
+import { ProductCard } from "@/common/card";
 
 const ReloadCard = ({ items, itemsPerLoad = 8 }) => {
     const [displayedItems, setDisplayedItems] = useState([]);
-    const [currentIndex, setCurrentIndex] = useState(itemsPerLoad);
 
     useEffect(() => {
-        // Inisialisasi item awal yang ditampilkan
+        // Inisialisasi item awal yang ditampilkan saat komponen dimuat atau ketika daftar items berubah
         setDisplayedItems(items.slice(0, itemsPerLoad));
+    }, [items, itemsPerLoad]);
 
-        // Event listener untuk scroll
+    const loadMoreItems = useCallback(() => {
+        setDisplayedItems(prevItems => {
+            const nextIndex = prevItems.length;
+            const newItems = items.slice(nextIndex, nextIndex + itemsPerLoad);
+            if (newItems.length > 0) {
+                return [...prevItems, ...newItems];
+            }
+            return prevItems;
+        });
+    }, [items, itemsPerLoad]);
+
+    useEffect(() => {
         const handleScroll = () => {
-            if (
-                window.innerHeight + document.documentElement.scrollTop
-                === document.documentElement.offsetHeight
-            ) {
-                // User telah scroll sampai bawah
+            // Jika user scroll hampir mencapai bagian bawah halaman (toleransi 50px), maka load item tambahan
+            if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 50) {
                 loadMoreItems();
             }
         };
 
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [items]);
-
-    const loadMoreItems = () => {
-        // Tambahkan item baru ke displayedItems
-        const newItems = items.slice(
-            currentIndex,
-            currentIndex + itemsPerLoad
-        );
-
-        if (newItems.length > 0) {
-            setDisplayedItems([...displayedItems, ...newItems]);
-            setCurrentIndex(currentIndex + itemsPerLoad);
-        }
-    };
+    }, [loadMoreItems]);
 
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {displayedItems.map((vendor, index) => (
-                <VendorCard
-                    key={index}
-                    vendor={{
-                        id: vendor.id,
-                        nama: vendor.nama,
-                        gambar: vendor.gambar,
-                        kategori: vendor.kategori,
-                        rating: vendor.rating,
-                        reviews: vendor.reviews,
-                        harga_mulai: vendor.harga_mulai
+            {displayedItems.map((product, index) => (
+                <ProductCard
+                    key={product.id}
+                    product={{
+                        gambar: product.gambar || '/images/placeholder-product.png',
+                        nama: product.nama,
+                        id: product.id,
+                        harga: product.harga,
+                        rating: product.rating || 0,
+                        deskripsi: product.deskripsi || 'Deskripsi tidak tersedia',
+                        terjual: product.terjual || 0
                     }}
                 />
             ))}
-            {currentIndex < items.length && (
+            {displayedItems.length < items.length && (
                 <div className="col-span-full text-center py-4">
                     <img src="/images/loading.gif" alt="Loading" className="w-12 h-12 mx-auto" />
                 </div>

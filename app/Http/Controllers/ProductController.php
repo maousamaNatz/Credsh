@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Traits\FileManagerTrait;
+use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
 {
@@ -21,7 +23,7 @@ class ProductController extends Controller
         $products = Product::latest()->paginate(10);
 
         return Inertia::render('Products/Index', [
-            'products' => $products
+            'products' => $products,
         ]);
     }
 
@@ -33,7 +35,7 @@ class ProductController extends Controller
         $categories = Category::orderBy('nama')->get();
 
         return Inertia::render('Vendors/Products/Create', [
-            'categories' => $categories
+            'categories' => $categories,
         ]);
     }
 
@@ -42,45 +44,49 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nama'           => 'required|string|max:255', // Ubah menjadi required
-            'deskripsi'      => 'nullable|string',
-            'harga'          => 'required|numeric|min:0',
-            'gambar'         => 'nullable|array|max:5',
-            'gambar.*'       => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category_id'    => 'nullable|exists:categories,id' // Tambahkan validasi untuk category_id
-        ]);
+        if (Gate::allows('vendor')) {
+            $validated = $request->validate([
+                'nama' => 'required|string|max:255',
+                'deskripsi' => 'nullable|string',
+                'harga' => 'required|numeric|min:0',
+                'gambar' => 'nullable|array|max:5',
+                'gambar.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+                'category_id' => 'nullable|exists:categories,id',
+            ]);
 
-        // Jika nama tidak diisi, berikan nilai default
-        if (empty($validated['nama'])) {
-            $validated['nama'] = 'Produk tanpa nama';
-        }
+            $user = auth()->user();
+            $validated['vendor_id'] = $user->id;
+            $validated['vendor_name'] = $user->name;
+            $validated['slug'] = Str::slug($validated['nama']);
 
-        $user = auth()->user();
-
-        // Menyimpan gambar jika ada
-        if ($request->hasFile('gambar')) {
-            $savedImages = [];
-            foreach ($request->file('gambar') as $file) {
-                $savedImages[] = $this->saveUserFile($user, $file, 'products');
+            // Simpan path gambar yang benar
+            if ($request->hasFile('gambar')) {
+                $savedImages = [];
+                foreach ($request->file('gambar') as $file) {
+                    $path = $this->saveUserFile($user, $file, 'products');
+                    $savedImages[] = $path; // Simpan path relatif
+                }
+                $validated['gambar'] = $savedImages; // Simpan sebagai array
             }
-            $validated['gambar'] = json_encode($savedImages);
+
+            // Menyimpan produk
+            $product = Product::create($validated);
+
+            // Menyimpan kategori jika ada
+            if (isset($validated['category_id'])) {
+                $product->categories()->sync([$validated['category_id']]); // Sync dengan category_id
+            }
+
+            return redirect()
+                ->route('products.show', $product->id)
+                ->with('message', 'Product berhasil dibuat.');
         }
-
-        // Menambahkan vendor_id dan vendor_name
-        $validated['vendor_id'] = $user->id;
-        $validated['vendor_name'] = $user->name;
-        $validated['slug'] = Str::slug($validated['nama']);
-
-        // Menyimpan produk
-        $product = Product::create($validated);
-
-        // Menyimpan kategori jika ada
-        if (isset($validated['category_id'])) {
-            $product->categories()->sync([$validated['category_id']]); // Sync dengan category_id
-        }
-
-        return redirect()->route('products.show', $product->id)->with('message', 'Product berhasil dibuat.');
+        return redirect()
+            ->route('products.index')
+            ->with(
+                'message',
+                'Anda tidak memiliki akses untuk membuat product.'
+            );
     }
     /**
      * Tampilkan detail product tertentu.
@@ -89,8 +95,9 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
+        // Pastikan gambar dapat diakses
         return Inertia::render('Vendors/Products/Show', [
-            'product' => $product
+            'product' => $product,
         ]);
     }
 
@@ -101,8 +108,11 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        return Inertia::render('Products/Edit', [
-            'product' => $product
+        $comments = Comment::where('product_id', $product->id)->get();
+
+        return Inertia::render('Vendors/Products/Edit', [
+            'product' => $product,
+            'comments' => $comments,
         ]);
     }
 
@@ -114,12 +124,12 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
 
         $validated = $request->validate([
-            'nama'         => 'required|string|max:255',
-            'deskripsi'    => 'nullable|string',
-            'harga'        => 'required|numeric|min:0',
-            'gambar'       => 'nullable|array|max:5',
-            'gambar.*'     => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'category_id'  => 'nullable|exists:categories,id',
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'nullable|string',
+            'harga' => 'required|numeric|min:0',
+            'gambar' => 'nullable|array|max:5',
+            'gambar.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'category_id' => 'nullable|exists:categories,id',
         ]);
 
         $user = auth()->user();
@@ -144,7 +154,9 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        return redirect()->route('products.index')->with('message', 'Product berhasil diperbarui.');
+        return redirect()
+            ->route('products.index')
+            ->with('message', 'Product berhasil diperbarui.');
     }
 
     /**
@@ -165,6 +177,8 @@ class ProductController extends Controller
 
         $product->delete();
 
-        return redirect()->route('products.index')->with('message', 'Product berhasil dihapus.');
+        return redirect()
+            ->route('products.index')
+            ->with('message', 'Product berhasil dihapus.');
     }
 }

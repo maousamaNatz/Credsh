@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from '@inertiajs/react';
 import Rating from '@/template/ratting';
-
 // Card dasar yang dapat digunakan kembali
 export function Card({ children, className = '' }) {
     return (
@@ -94,11 +93,25 @@ export function ArticleCard({ article }) {
 
 // Card untuk produk
 export function ProductCard({ product }) {
+    // Mengonversi field gambar jika berupa JSON, jika tidak menggunakan gambar placeholder
+    let imageUrl = '/images/placeholder-product.png';
+    if (product.gambar) {
+        try {
+            const parsedImages = JSON.parse(product.gambar);
+            if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+                imageUrl = parsedImages[0];
+            }
+        } catch (error) {
+            // Jika parsing gagal, gunakan nilai gambar secara langsung
+            imageUrl = product.gambar || imageUrl;
+        }
+    }
+
     return (
         <Card>
             <div className="relative group">
                 <img
-                    src={product.gambar}
+                    src={imageUrl}
                     alt={product.nama}
                     className="w-full h-56 object-cover rounded-t-2xl group-hover:scale-105 transition-transform duration-300"
                 />
@@ -116,7 +129,9 @@ export function ProductCard({ product }) {
                     <h3 className="text-lg font-bold text-gray-800">{product.nama}</h3>
                     <Rating rating={product.rating} readOnly={true} />
                 </div>
-                <p className="text-gray-600 text-sm mb-4">{product.deskripsi_singkat}</p>
+                <p className="text-gray-600 text-sm mb-4">
+                    <span dangerouslySetInnerHTML={{ __html: product.deskripsi }} />
+                </p>
                 <div className="flex items-center justify-between">
                     <span className="text-xl font-bold text-pink-600">Rp {product.harga}</span>
                     <span className="text-sm text-gray-500">{product.terjual} Terjual</span>
@@ -153,3 +168,4 @@ export function TestimonialCard({ testimonial }) {
         </Card>
     );
 }
+

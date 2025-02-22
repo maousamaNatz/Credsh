@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import L, { Layer } from "leaflet";
+import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -7,11 +7,12 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 const MapComponent = ({
     center = [-6.2, 106.816666],
     zoom = 13,
-    venue = {},
+    vendors = [],
     onLocationSelect,
 }) => {
     const mapRef = useRef(null);
-    const markerRef = useRef(null);
+    const markerRef = useRef(null); // Marker for a selected location (via search or click)
+    const markersRef = useRef([]);  // Array to hold vendor markers
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -21,13 +22,10 @@ const MapComponent = ({
             setSearchResults([]);
             return;
         }
-
         setLoading(true);
         try {
             const response = await fetch(
-                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-                    query
-                )}`
+                `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`
             );
             const data = await response.json();
             setSearchResults(data);
@@ -40,14 +38,29 @@ const MapComponent = ({
 
     const handleLocationSelect = (location) => {
         const newCenter = [parseFloat(location.lat), parseFloat(location.lon)];
-
         if (mapRef.current) {
             mapRef.current.setView(newCenter, zoom);
-
             if (markerRef.current) {
                 markerRef.current.setLatLng(newCenter);
+                const popupContent = `
+                    <div class="modern-popup">
+                        <div class="popup-header">
+                            <div class="no-image">📍</div>
+                        </div>
+                        <div class="popup-content">
+                            <h3>Selected Location</h3>
+                            <p class="address">Coordinates: ${newCenter[0]}, ${newCenter[1]}</p>
+                        </div>
+                    </div>
+                `;
+                markerRef.current
+                    .bindPopup(popupContent, {
+                        className: "modern-popup-container",
+                        maxWidth: 320,
+                        minWidth: 280,
+                    })
+                    .openPopup();
             }
-
             if (onLocationSelect) {
                 onLocationSelect({
                     lat: location.lat,
@@ -56,7 +69,6 @@ const MapComponent = ({
                 });
             }
         }
-
         setSearchResults([]);
         setSearchQuery(location.display_name);
     };
@@ -65,7 +77,6 @@ const MapComponent = ({
         const debounceTimer = setTimeout(() => {
             searchLocation(searchQuery);
         }, 500);
-
         return () => clearTimeout(debounceTimer);
     }, [searchQuery]);
 
@@ -81,70 +92,81 @@ const MapComponent = ({
             shadowSize: [41, 41],
         });
 
-        // Inisialisasi peta jika belum ada
         if (!mapRef.current) {
             const map = L.map("map", {
-                zoomControl: false // Sembunyikan kontrol zoom default
+                zoomControl: false,
             }).setView(center, zoom);
             mapRef.current = map;
 
-            // Gunakan peta style modern
+            // Use Mapbox tile layer (ensure REACT_APP_MAPBOX_ACCESS_TOKEN is set in your env)
             L.tileLayer(
-                'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                `https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=${process.env.REACT_APP_MAPBOX_ACCESS_TOKEN}`,
                 {
+                    attribution:
+                        'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    maxZoom: 18,
+                    id: "mapbox/streets-v11",
+                    tileSize: 512,
+                    zoomOffset: -1,
                 }
             ).addTo(map);
 
-            // Tambahkan custom zoom control
+            // Add custom zoom control to bottom right
             L.control.zoom({
-                position: 'bottomright'
+                position: "bottomright",
             }).addTo(map);
 
-            // Tambahkan marker dengan style modern
-            const marker = L.marker(center, {
+            // Create a marker for user selection with a custom style
+            const selectionMarker = L.marker(center, {
                 icon: L.divIcon({
-                    className: 'custom-marker',
+                    className: "custom-marker",
                     html: `<div class="marker-pin"></div>`,
                     iconSize: [30, 42],
-                    iconAnchor: [15, 42]
-                })
+                    iconAnchor: [15, 42],
+                }),
             }).addTo(map);
-            markerRef.current = marker;
+            markerRef.current = selectionMarker;
 
             const popupContent = `
                 <div class="modern-popup">
-                    <div class="popup-header" style="background-image: url('${venue.image || ''}')">
-                        ${venue.image ? '' : '<div class="no-image">📍</div>'}
+                    <div class="popup-header">
+                        <div class="no-image">📍</div>
                     </div>
                     <div class="popup-content">
-                        <h3>${venue.name || "Lokasi Pernikahan"}</h3>
-                        <p class="address">${venue.address || "Alamat venue akan ditampilkan di sini"}</p>
-                        ${venue.date || venue.time ? `
-                            <div class="event-details">
-                                ${venue.date ? `<div class="detail-item"><i class="far fa-calendar"></i>${venue.date}</div>` : ''}
-                                ${venue.time ? `<div class="detail-item"><i class="far fa-clock"></i>${venue.time}</div>` : ''}
-                            </div>
-                        ` : ''}
-                        ${venue.directions ? `
-                            <a href="${venue.directions}" target="_blank" class="directions-btn">
-                                <i class="fas fa-directions"></i> Petunjuk Arah
-                            </a>
-                        ` : ''}
+                        <h3>Selected Location</h3>
+                        <p class="address">Coordinates: ${center[0]}, ${center[1]}</p>
                     </div>
                 </div>
             `;
-            marker.bindPopup(popupContent, {
-                className: 'modern-popup-container',
+            selectionMarker.bindPopup(popupContent, {
+                className: "modern-popup-container",
                 maxWidth: 320,
                 minWidth: 280,
             }).openPopup();
 
+            // Update selected marker on map click
             map.on("click", (e) => {
                 const { lat, lng } = e.latlng;
-                marker.setLatLng([lat, lng]);
+                selectionMarker.setLatLng([lat, lng]);
                 if (onLocationSelect) {
                     onLocationSelect({ lat, lon: lng });
                 }
+                const updatedPopup = `
+                    <div class="modern-popup">
+                        <div class="popup-header">
+                            <div class="no-image">📍</div>
+                        </div>
+                        <div class="popup-content">
+                            <h3>Selected Location</h3>
+                            <p class="address">Coordinates: ${lat}, ${lng}</p>
+                        </div>
+                    </div>
+                `;
+                selectionMarker.bindPopup(updatedPopup, {
+                    className: "modern-popup-container",
+                    maxWidth: 320,
+                    minWidth: 280,
+                }).openPopup();
             });
         }
 
@@ -154,7 +176,78 @@ const MapComponent = ({
                 mapRef.current = null;
             }
         };
-    }, [center, zoom, venue]);
+    }, [center, zoom, onLocationSelect]);
+
+    // Effect to update vendor markers on the map whenever the vendors prop changes
+    useEffect(() => {
+        if (!mapRef.current) return;
+        // Remove existing vendor markers
+        markersRef.current.forEach((marker) => marker.remove());
+        markersRef.current = [];
+
+        vendors.forEach((vendor) => {
+            const lat = parseFloat(vendor.lat);
+            const lon = parseFloat(vendor.lon);
+            if (!lat || !lon) return;
+            const vendorMarker = L.marker([lat, lon], {
+                icon: L.divIcon({
+                    className: "custom-marker",
+                    html: `<div class="marker-pin"></div>`,
+                    iconSize: [30, 42],
+                    iconAnchor: [15, 42],
+                }),
+            }).addTo(mapRef.current);
+
+            const popupContent = `
+                <div class="modern-popup">
+                    <div class="popup-header" style="background-image: url('${
+                        vendor.image || ""
+                    }')">
+                        ${vendor.image ? "" : '<div class="no-image">📍</div>'}
+                    </div>
+                    <div class="popup-content">
+                        <h3>${vendor.name || "Vendor Location"}</h3>
+                        <p class="address">${
+                            vendor.address || "Vendor address will be shown here"
+                        }</p>
+                        ${
+                            vendor.date || vendor.time
+                                ? `
+                            <div class="event-details">
+                                ${
+                                    vendor.date
+                                        ? `<div class="detail-item"><i class="far fa-calendar"></i>${vendor.date}</div>`
+                                        : ""
+                                }
+                                ${
+                                    vendor.time
+                                        ? `<div class="detail-item"><i class="far fa-clock"></i>${vendor.time}</div>`
+                                        : ""
+                                }
+                            </div>
+                        `
+                                : ""
+                        }
+                        ${
+                            vendor.directions
+                                ? `
+                            <a href="${vendor.directions}" target="_blank" class="directions-btn">
+                                <i class="fas fa-directions"></i> Directions
+                            </a>
+                        `
+                                : ""
+                        }
+                    </div>
+                </div>
+            `;
+            vendorMarker.bindPopup(popupContent, {
+                className: "modern-popup-container",
+                maxWidth: 320,
+                minWidth: 280,
+            });
+            markersRef.current.push(vendorMarker);
+        });
+    }, [vendors]);
 
     return (
         <div className="relative w-full">

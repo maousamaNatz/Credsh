@@ -5,65 +5,33 @@ namespace App\Http\Controllers;
 use Inertia\Inertia;
 use App\Models\Vendor;
 use App\Models\Article;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class MainController extends Controller
 {
     public function index()
     {
-        // Data dummy untuk popular vendors
-        $popularVendors = [
-            [
-                'id' => 1,
-                'nama' => 'Vendor Fotografi A',
-                'gambar' => 'https://placehold.co/300x200',
-                'rating' => 4.8,
-                'reviews' => 120,
-                'harga_mulai' => '5.000.000'
-            ],
-            [
-                'id' => 2,
-                'nama' => 'Vendor Katering B',
-                'gambar' => 'https://placehold.co/300x200',
-                'rating' => 4.6,
-                'reviews' => 98,
-                'harga_mulai' => '15.000.000'
-            ],
-            [
-                'id' => 3,
-                'nama' => 'Vendor Dekorasi C',
-                'gambar' => 'https://placehold.co/300x200',
-                'rating' => 4.9,
-                'reviews' => 150,
-                'harga_mulai' => '10.000.000'
-            ]
-        ];
+        // Mengambil data vendor populer dari database
+        $popularVendors = Vendor::withCount('bookings') // Menghitung jumlah booking
+            ->orderBy('bookings_count', 'desc') // Mengurutkan berdasarkan jumlah booking
+            ->limit(3) // Mengambil 3 vendor terpopuler
+            ->get(['id', 'nama', 'gambar', 'rating', 'harga_mulai']);
 
-        // Data dummy untuk artikel terbaru
-        $latestArticles = [
-            [
-                'id' => 1,
-                'judul' => 'Tips Memilih Vendor Pernikahan',
-                'deskripsi' => 'Panduan lengkap memilih vendor pernikahan yang tepat sesuai budget',
-                'gambar' => 'https://placehold.co/300x200'
-            ],
-            [
-                'id' => 2,
-                'judul' => 'Inspirasi Dekorasi Outdoor',
-                'deskripsi' => 'Kumpulan ide dekorasi pernikahan outdoor yang memukau',
-                'gambar' => 'https://placehold.co/300x200'
-            ],
-            [
-                'id' => 3,
-                'judul' => 'Persiapan Sebelum Hari-H',
-                'deskripsi' => 'Checklist lengkap yang harus dipersiapkan menjelang hari pernikahan',
-                'gambar' => 'https://placehold.co/300x200'
-            ]
-        ];
+        // Mengambil data artikel terbaru dari database
+        $latestArticles = Article::latest()->limit(8)->get(['id', 'judul', 'deskripsi', 'gambar']);
+
+        // Mengambil produk terbaru dari database
+        $products = Product::latest()->limit(8)->get(['id', 'nama', 'gambar', 'harga', 'vendor_id', 'deskripsi', 'rating', 'views']);
+
+        // Mengambil semua vendor untuk peta
+        $mapsVendors = Vendor::all(['id', 'nama', 'latitude', 'longitude']); // Pastikan untuk mengambil koordinat
 
         return Inertia::render('HomePage', [
             'popularVendors' => $popularVendors,
-            'latestArticles' => $latestArticles
+            'latestArticles' => $latestArticles,
+            'products' => $products,
+            'mapsVendors' => $mapsVendors // Mengirimkan data vendor untuk peta
         ]);
     }
     public function search(Request $request)

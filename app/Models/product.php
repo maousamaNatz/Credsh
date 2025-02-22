@@ -18,6 +18,9 @@ class Product extends Model
         'gambar',
         'slug',
         'status',
+        'rating',
+        'terjual',
+        'views',
         'vendor_id',
         'vendor_name',
     ];
@@ -39,5 +42,10 @@ class Product extends Model
         return $this->gambar
             ? asset('storage/' . $this->gambar)
             : asset('images/default-product.jpg');
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

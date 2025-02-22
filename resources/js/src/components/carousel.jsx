@@ -6,6 +6,7 @@ import { VendorCard, ProductCard, ArticleCard, TestimonialCard } from "@/common/
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
+import "swiper/swiper-bundle.css";
 
 const CardCarousel = ({
     items,
@@ -46,6 +47,8 @@ const CardCarousel = ({
         }
     };
 
+    const slidesPerGroup = slidesPerView;
+
     return (
         <div className="relative">
             {navigation && (
@@ -85,6 +88,7 @@ const CardCarousel = ({
                 modules={[Navigation, Pagination, Autoplay]}
                 spaceBetween={spaceBetween}
                 slidesPerView={slidesPerView}
+                slidesPerGroup={slidesPerGroup}
                 navigation={navigation ? {
                     prevEl: ".swiper-custom-prev",
                     nextEl: ".swiper-custom-next",

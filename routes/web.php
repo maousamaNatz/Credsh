@@ -6,6 +6,7 @@ use Illuminate\Foundation\Application;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\BookingController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VendorProfileController;
+use App\Http\Controllers\RattingProductsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
@@ -34,6 +36,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/edit-profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::post('/ratings', [RatingController::class, 'store']);
+    Route::put('/ratings/{rating}', [RatingController::class, 'update']);
+    Route::delete('/ratings/{rating}', [RatingController::class, 'destroy']);
 });
 
 // Route untuk semua user yang terautentikasi
@@ -48,7 +53,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Route khusus vendor
 Route::middleware(['auth', 'role:vendor'])->group(function () {
-    Route::resource('products', ProductController::class);
+    Route::resource('products', ProductController::class)->except(['show']);
     Route::get('/vendor/dashboard', [VendorController::class, 'dashboard'])->name('vendor.dashboard');
 });
 
@@ -79,5 +84,11 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     // Reports Management
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
     Route::put('/reports/{report}', [AdminController::class, 'updateReport'])->name('admin.reports.update');
+    // Untuk tampilan rating
 });
+Route::get('/vendors/{vendor}/ratings', [RatingController::class, 'index']);
+
+Route::post('/products/{product}/comments', [RattingProductsController::class, 'store'])->middleware('auth');
+
+Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
 require __DIR__ . '/auth.php';

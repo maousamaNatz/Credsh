@@ -117,4 +117,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->document_path ? asset("storage/{$this->document_path}") : null;
     }
+
+    // Relasi ke model Product
+    public function products()
+    {
+        return $this->hasMany(Product::class, 'vendor_id'); // Pastikan 'Product' adalah model yang sesuai
+    }
 }
