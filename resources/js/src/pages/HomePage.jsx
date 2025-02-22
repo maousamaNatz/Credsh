@@ -14,8 +14,8 @@ export default function HomePage({
             <section className="relative h-screen w-full">
                 <div className="absolute inset-0 w-full h-full">
                     <VideoWithFallback
-                        videoSrc="media/2.mp4"
-                        imageSrc="/images/hero-bg.jpg"
+                        videoSrc="media/1.mp4"
+                        imageSrc="/images/1.jpg"
                         options={{
                             autoplay: true,
                             muted: true,

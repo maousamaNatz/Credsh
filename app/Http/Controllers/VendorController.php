@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
-use App\Traits\FileStorageTrait;
+use App\Traits\FileManagerTrait;
 
 class VendorController extends Controller
 {
-    use FileStorageTrait;
+    use FileManagerTrait;
 
     public function store(Request $request)
     {
@@ -20,7 +21,8 @@ class VendorController extends Controller
             'kategori' => $request->kategori,
             'alamat' => $request->alamat,
             'kontak' => $request->kontak,
-            'harga' => $request->harga
+            'harga' => $request->harga,
+            'deskripsi' => $request->deskripsi
         ]);
 
         // Simpan dokumen vendor
@@ -29,10 +31,11 @@ class VendorController extends Controller
 
             // Validasi file
             if ($dokumen->isValid() && $dokumen->getClientOriginalExtension() === 'pdf') {
-                $path = $this->saveVendorFile(
-                    $vendor->id,
+                $user = User::find($vendor->user_id);
+                $path = $this->saveUserFile(
+                    $user,
                     $dokumen,
-                    $dokumen->getClientOriginalName()
+                    'documents'
                 );
 
                 $vendor->dokumen_path = $path;

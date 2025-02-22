@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -21,21 +21,11 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
         'google_id',
-        'verification_token',
+        'password',
         'status',
         'role',
-        'last_login',
-        'vendor_details',
-        'email_verified_at'
-    ];
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-        'last_login' => 'datetime',
-        'vendor_details' => 'json',
-        'status' => 'string',
-        'role' => 'string',
+        'avatar',
     ];
 
     /**
@@ -43,20 +33,23 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 
     /**
      * Get the attributes that should be cast.
      *
      * @return array<string, string>
      */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'last_login' => 'datetime',
+        'status' => 'string',
+        'avatar' => 'string',
+        'role' => 'string',
+    ];
 
     public function vendor()
     {

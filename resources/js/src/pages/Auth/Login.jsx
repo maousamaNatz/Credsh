@@ -29,9 +29,12 @@ export default function Login({ status, canResetPassword }) {
             <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-pink-100 via-white to-pink-50">
                 <div className="w-full sm:max-w-md p-8 bg-white rounded-2xl shadow-lg">
                     <div className="mb-8 text-center">
-                        <Link href="/" className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600">
-                            Credsh
-                        </Link>
+                    <Link
+                                href="/"
+                                className="font-gagliane text-xl sm:text-2xl xl:text-3xl text-red-600 hover:text-red-700 transition duration-300 px-2"
+                            >
+                                CredSh
+                            </Link>
                         <h2 className="mt-3 text-2xl font-bold text-gray-800">Selamat Datang Kembali</h2>
                         <p className="mt-2 text-gray-600">Silakan masuk ke akun Anda</p>
                     </div>

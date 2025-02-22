@@ -21,7 +21,6 @@ return new class extends Migration
             $table->string('longitude', 50)->nullable();
             $table->decimal('harga_mulai', 15, 2);
             $table->boolean('status')->default(true);
-            $table->string('gambar')->nullable();
             $table->decimal('rating', 3, 2)->nullable();
             $table->timestamps();
         });

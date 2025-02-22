@@ -18,6 +18,8 @@ export default defineConfig({
             "@/data": "/resources/js/src/data",
             "@/components": "/resources/js/src/components",
             "@/Layouts": "/resources/js/src/Layouts",
+            "@/helpers": "/resources/js/src/helpers",
+            "@/public": "/resources/js/src/public",
         },
     },
 });

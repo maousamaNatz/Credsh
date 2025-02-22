@@ -12,21 +12,18 @@ class Vendor extends Model
     protected $fillable = [
         'user_id',
         'nama',
-        'deskripsi',
         'alamat',
-        'negara',
-        'kode_pos',
-        'telepon',
-        'nama_manager',
-        'gambar',
+        'deskripsi',
+        'latitude',
+        'longitude',
+        'harga_mulai',
         'status',
-        'kategori',
-        'lokasi'
+        'rating',
     ];
 
     protected $casts = [
-        'portfolio' => 'array',
-        'bank_account' => 'array'
+        'status' => 'boolean',
+        'rating' => 'decimal:2'
     ];
 
     public function user()
@@ -42,10 +39,5 @@ class Vendor extends Model
     public function products()
     {
         return $this->hasMany(Product::class);
-    }
-
-    public function getGambarUrlAttribute()
-    {
-        return $this->gambar ? asset('storage/'.$this->gambar) : asset('images/default-vendor.jpg');
     }
 }

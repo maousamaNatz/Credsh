@@ -200,8 +200,5 @@ GOOGLE_MAPS_API_KEY=
 4. Push ke branch (`git push origin fitur-baru`)
 5. Buat Pull Request
 
-## Dokumentasi API
-Lihat dokumentasi API lengkap di [API Documentation](https://documenter.getpostman.com/view/12345678/2sA3BXYZXY)
-
 ## Lisensi
 MIT License © 2024 Maousamanatz

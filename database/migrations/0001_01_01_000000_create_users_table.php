@@ -19,10 +19,10 @@ return new class extends Migration
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('verification_token')->nullable();
+            $table->string('avatar')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('inactive');
             $table->enum('role', ['admin', 'vendor', 'user'])->default('user');
             $table->timestamp('last_login')->nullable();
-            $table->json('vendor_details')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
