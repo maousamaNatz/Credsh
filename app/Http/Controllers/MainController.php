@@ -22,7 +22,7 @@ class MainController extends Controller
         $latestArticles = Article::latest()->limit(8)->get(['id', 'judul', 'deskripsi', 'gambar']);
 
         // Mengambil produk terbaru dari database
-        $products = Product::latest()->limit(8)->get(['id', 'nama', 'gambar', 'harga', 'vendor_id', 'deskripsi', 'rating', 'views']);
+        $products = Product::latest()->limit(8)->get(['id', 'nama', 'gambar', 'harga', 'vendor_id', 'deskripsi', 'rating', 'views', 'slug']);
 
         // Mengambil semua vendor untuk peta
         $mapsVendors = Vendor::all(['id', 'nama', 'latitude', 'longitude']); // Pastikan untuk mengambil koordinat

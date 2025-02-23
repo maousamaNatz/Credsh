@@ -48,11 +48,20 @@ return new class extends Migration {
             $table->integer('rating');
             $table->timestamps();
         });
+
+        Schema::create('cart', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('product_id')->constrained('products');
+            $table->integer('quantity');
+            $table->timestamps();
+        });
     }
 
     public function down()
     {
         Schema::dropIfExists('products');
         Schema::dropIfExists('comments');
+        Schema::dropIfExists('cart');
     }
 };

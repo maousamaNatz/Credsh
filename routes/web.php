@@ -3,6 +3,7 @@
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Foundation\Application;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\MainController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AdminController;
@@ -34,6 +35,16 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
+
+    // Cart routes
+    Route::prefix('cart')->group(function () {
+        Route::post('/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
+        Route::get('/view', [CartController::class, 'viewCart'])->name('cart.view');
+        Route::get('/count', [CartController::class, 'count'])->name('cart.count');
+        Route::post('/checkout', [CartController::class, 'checkout'])->name('cart.checkout');
+        Route::post('/place-order', [CartController::class, 'placeOrder'])->name('cart.place-order');
+    });
+
     Route::get('/edit-profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
     Route::post('/ratings', [RatingController::class, 'store']);
@@ -45,7 +56,6 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
-    Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     Route::post('/vendor/setup', [ProfileController::class, 'setupVendorProfile'])->name('vendor.setup');
@@ -90,5 +100,8 @@ Route::get('/vendors/{vendor}/ratings', [RatingController::class, 'index']);
 
 Route::post('/products/{product}/comments', [RattingProductsController::class, 'store'])->middleware('auth');
 
-Route::get('/products/{product}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+
+
+
 require __DIR__ . '/auth.php';

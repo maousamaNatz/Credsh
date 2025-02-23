@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Link, usePage, router } from "@inertiajs/react";
 import Dropdown, { DropdownItem } from "@/common/dropdown";
 import {
@@ -10,6 +10,7 @@ import {
     IconBell,
 } from "@/common/icons";
 import { SearchBar } from "@/common/search";
+import axios from "axios";
 
 export default function Navbar() {
     const { auth } = usePage().props;
@@ -17,6 +18,22 @@ export default function Navbar() {
     const [selectedLocation, setSelectedLocation] = useState("Jakarta");
     const [isDetecting, setIsDetecting] = useState(false);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const [cartCount, setCartCount] = useState(0);
+
+    const fetchCartCount = async () => {
+        try {
+            const response = await axios.get(route('cart.count'));
+            if (response.data.success) {
+                setCartCount(response.data.count);
+            }
+        } catch (error) {
+            console.error('Error fetching cart count:', error.response?.data?.message || error.message);
+        }
+    };
+
+    useEffect(() => {
+        fetchCartCount();
+    }, []);
 
     const LocationTrigger = () => (
         <button className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 text-sm md:text-base">
@@ -132,12 +149,14 @@ export default function Navbar() {
                             {/* Mobile Icons & Menu Button */}
                             <div className="lg:hidden flex items-center gap-3">
                                 <Link
-                                    href="/cart"
+                                    href={route('cart.view')}
                                     className="text-gray-600 hover:text-red-600 relative"
+                                    preserveScroll
+                                    preserveState
                                 >
-                                    <IconCart className="w-5 h-5" />
+                                    <IconCart className="w-6 h-6" />
                                     <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                        0
+                                        {cartCount}
                                     </span>
                                 </Link>
                                 <button
@@ -276,12 +295,14 @@ export default function Navbar() {
                                                 </span>
                                             </Link>
                                             <Link
-                                                href="/cart"
+                                                href={route('cart.view')}
                                                 className="text-gray-600 hover:text-red-600 relative"
+                                                preserveScroll
+                                                preserveState
                                             >
                                                 <IconCart className="w-6 h-6" />
                                                 <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
-                                                    0
+                                                    {cartCount}
                                                 </span>
                                             </Link>
                                             <Dropdown

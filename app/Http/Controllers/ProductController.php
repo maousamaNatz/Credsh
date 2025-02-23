@@ -3,12 +3,14 @@
 namespace App\Http\Controllers;
 
 use Inertia\Inertia;
+use App\Models\Order;
 use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Traits\FileManagerTrait;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class ProductController extends Controller
@@ -59,14 +61,14 @@ class ProductController extends Controller
             $validated['vendor_name'] = $user->name;
             $validated['slug'] = Str::slug($validated['nama']);
 
-            // Simpan path gambar yang benar
+            // Perbaikan: Encode array gambar ke JSON
             if ($request->hasFile('gambar')) {
                 $savedImages = [];
                 foreach ($request->file('gambar') as $file) {
                     $path = $this->saveUserFile($user, $file, 'products');
-                    $savedImages[] = $path; // Simpan path relatif
+                    $savedImages[] = $path;
                 }
-                $validated['gambar'] = $savedImages; // Simpan sebagai array
+                $validated['gambar'] = json_encode($savedImages); // Convert array ke JSON string
             }
 
             // Menyimpan produk
@@ -78,7 +80,7 @@ class ProductController extends Controller
             }
 
             return redirect()
-                ->route('products.show', $product->id)
+                ->route('products.show', $product->slug)
                 ->with('message', 'Product berhasil dibuat.');
         }
         return redirect()
@@ -91,9 +93,8 @@ class ProductController extends Controller
     /**
      * Tampilkan detail product tertentu.
      */
-    public function show(string $id)
-    {
-        $product = Product::findOrFail($id);
+    public function show(string $slug)
+    {        $product = Product::where('slug', $slug)->firstOrFail();
 
         // Pastikan gambar dapat diakses
         return Inertia::render('Vendors/Products/Show', [
@@ -180,5 +181,29 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('message', 'Product berhasil dihapus.');
+    }
+
+    /**
+     * Proses pembelian produk.
+     */
+    public function buy(Request $request, string $id)
+    {
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+        ]);
+
+        $product = Product::findOrFail($id);
+
+        // Logika untuk menyimpan pembelian, misalnya ke model Order
+        // Misalkan kita memiliki model Order
+        $order = Order::create([
+            'user_id' => Auth::id(),
+            'product_id' => $product->id,
+            'quantity' => $validated['quantity'],
+            'total_price' => $product->harga * $validated['quantity'],
+            'status' => 'pending', // Status awal
+        ]);
+
+        return redirect()->route('orders.index')->with('message', 'Pembelian berhasil dilakukan.');
     }
 }
