@@ -14,6 +14,7 @@ use App\Http\Controllers\BookingController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\VendorProfileController;
 use App\Http\Controllers\RattingProductsController;
 use App\Http\Controllers\Auth\RegisteredUserController;
@@ -36,6 +37,9 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
+    Route::get('/payments/{product_slug}', [TransactionController::class, 'index'])->name('payments.payment');
+    Route::post('/payments/{transaction}', [TransactionController::class, 'payment'])->name('payments.payments');
+
     // Cart routes
     Route::prefix('cart')->group(function () {
         Route::post('/add/{productId}', [CartController::class, 'addToCart'])->name('cart.add');
@@ -50,6 +54,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/ratings', [RatingController::class, 'store']);
     Route::put('/ratings/{rating}', [RatingController::class, 'update']);
     Route::delete('/ratings/{rating}', [RatingController::class, 'destroy']);
+
+    Route::get('/transactions/payment/{product_slug}', [TransactionController::class, 'index'])->name('transactions.payment');
+    Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
+    Route::get('/transactions/invoice/{transaction}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
 });
 
 // Route untuk semua user yang terautentikasi
@@ -100,8 +108,9 @@ Route::get('/vendors/{vendor}/ratings', [RatingController::class, 'index']);
 
 Route::post('/products/{product}/comments', [RattingProductsController::class, 'store'])->middleware('auth');
 
-Route::get('/products/{slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name('products.show');
 
-
+// Tambahkan route untuk vendors.show
+Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
 
 require __DIR__ . '/auth.php';

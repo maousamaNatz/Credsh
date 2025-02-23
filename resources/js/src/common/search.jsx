@@ -5,14 +5,15 @@ import debounce from 'lodash/debounce';
 
 export function SearchBar() {
     const [searchQuery, setSearchQuery] = useState('');
-    const [results, setResults] = useState({ vendors: [], articles: [] });
+    const [results, setResults] = useState({ vendors: [], products: [], articles: [] });
     const [isLoading, setIsLoading] = useState(false);
     const [showResults, setShowResults] = useState(false);
+    const [error, setError] = useState(null);
     const searchRef = useRef(null);
 
     const debouncedSearch = debounce(async (query) => {
         if (!query.trim()) {
-            setResults({ vendors: [], articles: [] });
+            setResults({ vendors: [], products: [], articles: [] });
             setIsLoading(false);
             return;
         }
@@ -20,9 +21,11 @@ export function SearchBar() {
         try {
             const response = await axios.get(`/api/search?query=${encodeURIComponent(query)}`);
             setResults(response.data);
+            setError(null);
         } catch (error) {
             console.error('Error pencarian:', error);
-            setResults({ vendors: [], articles: [] });
+            setResults({ vendors: [], products: [], articles: [] });
+            setError('Terjadi kesalahan saat melakukan pencarian.');
         }
         setIsLoading(false);
     }, 300);
@@ -32,7 +35,7 @@ export function SearchBar() {
             setIsLoading(true);
             debouncedSearch(searchQuery);
         } else {
-            setResults({ vendors: [], articles: [] });
+            setResults({ vendors: [], products: [], articles: [] });
         }
         return () => debouncedSearch.cancel();
     }, [searchQuery]);
@@ -73,7 +76,7 @@ export function SearchBar() {
                     }}
                     onFocus={() => setShowResults(true)}
                 />
-                
+
                 <button
                     type="submit"
                     className="absolute right-3 top-1/2 -translate-y-1/2"
@@ -97,7 +100,12 @@ export function SearchBar() {
             {showResults && searchQuery.trim() !== '' && (
                 <div className="absolute z-50 w-full mt-2 bg-white rounded-lg shadow-lg border border-gray-200 max-h-96 overflow-y-auto">
                     <div className="divide-y divide-gray-100">
-                        {results.vendors.length === 0 && results.articles.length === 0 ? (
+                        {error && (
+                            <div className="px-4 py-3 text-sm text-red-500">
+                                {error}
+                            </div>
+                        )}
+                        {results.vendors.length === 0 && results.products.length === 0 && results.articles.length === 0 ? (
                             <div className="px-4 py-3 text-sm text-gray-500">
                                 Tidak ada hasil yang ditemukan untuk "{searchQuery}"
                             </div>
@@ -119,7 +127,30 @@ export function SearchBar() {
                                                     {vendor.nama}
                                                 </div>
                                                 <div className="text-xs text-gray-500 mt-1 truncate">
-                                                    {vendor.kategori} • {vendor.lokasi}
+                                                    {vendor.alamat}
+                                                </div>
+                                            </Link>
+                                        ))}
+                                    </div>
+                                )}
+
+                                {results.products.length > 0 && (
+                                    <div className="py-2">
+                                        <div className="px-4 py-2 text-xs font-semibold text-gray-500 bg-gray-50 sticky top-0">
+                                            PRODUK ({results.products.length})
+                                        </div>
+                                        {results.products.map((product) => (
+                                            <Link
+                                                key={product.id}
+                                                href={product.url}
+                                                className="block px-4 py-3 hover:bg-gray-50 transition-colors"
+                                                onClick={() => setShowResults(false)}
+                                            >
+                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                                    {product.nama}
+                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1 truncate">
+                                                    {product.deskripsi}
                                                 </div>
                                             </Link>
                                         ))}
@@ -140,9 +171,6 @@ export function SearchBar() {
                                             >
                                                 <div className="text-sm text-gray-900 truncate">
                                                     {article.judul}
-                                                </div>
-                                                <div className="text-xs text-gray-500 mt-1">
-                                                    {article.kategori}
                                                 </div>
                                             </Link>
                                         ))}

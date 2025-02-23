@@ -13,16 +13,25 @@ class VendorController extends Controller
 
     public function store(Request $request)
     {
-        // ... existing code ...
+        // Validasi input
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255', // Pastikan nama diisi
+            'kategori' => 'required|string|max:255',
+            'alamat' => 'required|string|max:255',
+            'kontak' => 'required|string|max:255',
+            'harga' => 'required|numeric',
+            'deskripsi' => 'nullable|string',
+            'dokumen' => 'nullable|file|mimes:pdf|max:2048',
+        ]);
 
         // Membuat vendor dengan data yang valid
         $vendor = Vendor::create([
-            'nama' => $request->nama,
-            'kategori' => $request->kategori,
-            'alamat' => $request->alamat,
-            'kontak' => $request->kontak,
-            'harga' => $request->harga,
-            'deskripsi' => $request->deskripsi
+            'nama' => $validated['nama'], // Pastikan nama diisi dari validasi
+            'kategori' => $validated['kategori'],
+            'alamat' => $validated['alamat'],
+            'kontak' => $validated['kontak'],
+            'harga' => $validated['harga'],
+            'deskripsi' => $validated['deskripsi']
         ]);
 
         // Simpan dokumen vendor

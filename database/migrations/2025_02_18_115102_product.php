@@ -12,38 +12,24 @@ return new class extends Migration {
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            // Relasi ke tabel categories (nullable apabila produk tidak wajib memiliki kategori)
-            $table
-                ->foreignId('category_id')
-                ->nullable()
-                ->constrained()
-                ->onDelete('set null');
+            $table->foreignId('category_id')->nullable()->constrained('categories')->onDelete('set null');
             $table->string('nama');
             $table->text('deskripsi')->nullable();
-            $table->decimal('harga', 12, 2);
+            $table->decimal('harga', 15, 2);
             $table->text('gambar')->nullable();
-            $table->string('slug')->nullable();
-            $table->string('status')->default('draft');
+            $table->string('slug')->unique();
+            $table->enum('status', ['draft', 'active', 'inactive'])->default('draft');
             $table->integer('rating')->default(0);
             $table->integer('terjual')->default(0);
             $table->integer('views')->default(0);
-            $table
-                ->foreignId('vendor_id')
-                ->constrained('users')
-                ->onDelete('cascade');
-            $table->string('vendor_name')->nullable();
+            $table->foreignId('vendor_id')->constrained('users')->onDelete('cascade'); // Perbaikan
             $table->timestamps();
         });
+
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
-            $table
-                ->foreignId('product_id')
-                ->constrained('products')
-                ->onDelete('cascade');
-            $table
-                ->foreignId('user_id')
-                ->constrained('users')
-                ->onDelete('cascade');
+            $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->text('komentar');
             $table->integer('rating');
             $table->timestamps();

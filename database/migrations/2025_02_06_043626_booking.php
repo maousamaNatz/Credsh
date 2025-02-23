@@ -16,9 +16,12 @@ return new class extends Migration
             $table->foreignId('vendor_id')->constrained()->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('users')->onDelete('cascade');
             $table->date('tanggal_acara');
+            $table->time('waktu_acara')->nullable(); // Tambahan
             $table->enum('status', ['pending', 'confirmed', 'cancelled', 'completed']);
             $table->decimal('total_harga', 15, 2);
+            $table->enum('payment_status', ['unpaid', 'paid', 'refunded'])->default('unpaid'); // Tambahan
             $table->text('deskripsi')->nullable();
+            $table->text('vendor_notes')->nullable(); // Tambahan
             $table->timestamps();
         });
     }

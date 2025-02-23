@@ -14,17 +14,15 @@ return new class extends Migration
         Schema::create('notifications', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('type');
-            $table->morphs('notifiable');
+            $table->morphs('notifiable'); // Bisa booking, transaksi, chat
             $table->text('data');
             $table->timestamp('read_at')->nullable();
-            $table->timestamps();
-
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->text('message');
             $table->enum('category', ['chat', 'booking', 'system']);
             $table->boolean('is_read')->default(false);
-            $table->unsignedBigInteger('reference_id')->nullable();
+            $table->timestamps();
         });
     }
 

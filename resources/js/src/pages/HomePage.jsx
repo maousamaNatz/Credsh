@@ -12,15 +12,6 @@ export default function HomePage({
   mapsVendors = [],
   products = [],
 }) {
-  // Filter vendor yang memiliki koordinat valid
-  const validVendors = mapsVendors.filter(
-    (vendor) =>
-      vendor.latitude &&
-      vendor.longitude &&
-      vendor.latitude !== null &&
-      vendor.longitude !== null,
-  )
-
   // Fungsi handle location select (jika diperlukan)
   const handleLocationSelect = (location) => {
     console.log('Selected location:', location)
@@ -122,11 +113,11 @@ export default function HomePage({
           <h2 className="text-3xl font-semibold text-center mb-12">
             Lokasi Kami
           </h2>
-          {validVendors.length > 0 ? (
+          {mapsVendors.length > 0 ? (
             <MapComponent
               center={[-6.2, 106.816666]}
               zoom={13}
-              venues={validVendors}
+              vendors={mapsVendors}
               onLocationSelect={handleLocationSelect}
             />
           ) : (

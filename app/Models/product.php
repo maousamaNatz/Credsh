@@ -21,20 +21,19 @@ class Product extends Model
         'rating',
         'terjual',
         'views',
-        'vendor_id',
-        'vendor_name',
+        'vendor_id', // Mengganti user_id dengan vendor_id
     ];
 
     // Relasi ke tabel Category
     public function categories()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsTo(Category::class); // Mengubah relasi menjadi belongsTo
     }
 
     // Relasi ke tabel User (Vendor)
     public function vendor()
     {
-        return $this->belongsTo(User::class, 'vendor_id');
+        return $this->belongsTo(User::class, 'vendor_id'); // Mengganti user_id dengan vendor_id
     }
 
     public function getGambarUrlAttribute()

@@ -24,9 +24,10 @@ class MainController extends Controller
         // Mengambil produk terbaru dari database
         $products = Product::latest()->limit(8)->get(['id', 'nama', 'gambar', 'harga', 'vendor_id', 'deskripsi', 'rating', 'views', 'slug']);
 
-        // Mengambil semua vendor untuk peta
-        $mapsVendors = Vendor::all(['id', 'nama', 'latitude', 'longitude']); // Pastikan untuk mengambil koordinat
-
+        // Mengambil semua vendor untuk peta dengan latitude dan longitude yang valid
+        $mapsVendors = Vendor::whereNotNull('latitude')
+            ->whereNotNull('longitude')
+            ->get(['id', 'nama', 'latitude', 'longitude']); // Pastikan untuk mengambil koordinat
         return Inertia::render('HomePage', [
             'popularVendors' => $popularVendors,
             'latestArticles' => $latestArticles,
@@ -41,30 +42,48 @@ class MainController extends Controller
         if (empty($query)) {
             return response()->json([
                 'vendors' => [],
+                'products' => [],
                 'articles' => []
             ]);
         }
 
+        // Pencarian Vendor
         $vendors = Vendor::where('nama', 'like', "%{$query}%")
-            ->orWhere('kategori', 'like', "%{$query}%")
-            ->orWhere('lokasi', 'like', "%{$query}%")
+            ->orWhere('alamat', 'like', "%{$query}%")
+            ->orWhere('deskripsi', 'like', "%{$query}%")
             ->limit(5)
-            ->get(['id', 'nama', 'kategori', 'lokasi'])
+            ->get(['id', 'nama', 'alamat', 'deskripsi'])
             ->map(function ($vendor) {
                 return [
                     'id' => $vendor->id,
                     'nama' => $vendor->nama,
-                    'kategori' => $vendor->kategori,
-                    'lokasi' => $vendor->lokasi,
+                    'alamat' => $vendor->alamat,
+                    'deskripsi' => $vendor->deskripsi,
                     'type' => 'vendor',
                     'url' => route('vendors.show', $vendor->id)
                 ];
             });
 
+        // Pencarian Product
+        $products = Product::where('nama', 'like', "%{$query}%")
+            ->orWhere('deskripsi', 'like', "%{$query}%")
+            ->limit(5)
+            ->get(['id', 'nama', 'slug', 'deskripsi'])
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'nama' => $product->nama,
+                    'deskripsi' => $product->deskripsi,
+                    'type' => 'product',
+                    'url' => route('products.show', $product->slug)
+                ];
+            });
+
+        // Pencarian Article
         $articles = Article::where('judul', 'like', "%{$query}%")
             ->orWhere('deskripsi', 'like', "%{$query}%")
             ->limit(3)
-            ->get(['id', 'judul'])
+            ->get(['id', 'judul', 'deskripsi'])
             ->map(function ($article) {
                 return [
                     'id' => $article->id,
@@ -74,10 +93,14 @@ class MainController extends Controller
                 ];
             });
 
-        return response()->json([
+        // Gabungkan semua hasil pencarian
+        $allResults = [
             'vendors' => $vendors,
+            'products' => $products,
             'articles' => $articles
-        ]);
+        ];
+
+        return response()->json($allResults);
     }
 
     public function show(Request $request)
@@ -85,7 +108,6 @@ class MainController extends Controller
         $query = $request->input('q');
 
         $vendors = Vendor::where('nama', 'like', "%{$query}%")
-            ->orWhere('kategori', 'like', "%{$query}%")
             ->orWhere('lokasi', 'like', "%{$query}%")
             ->paginate(12);
 

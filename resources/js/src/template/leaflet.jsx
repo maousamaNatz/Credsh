@@ -170,84 +170,28 @@ const MapComponent = ({
             });
         }
 
+        // Hapus marker yang ada sebelumnya
+        markersRef.current.forEach(marker => marker.remove());
+        markersRef.current = [];
+
+        // Tambahkan marker untuk setiap vendor
+        vendors.forEach(vendor => {
+            const lat = parseFloat(vendor.latitude);
+            const lon = parseFloat(vendor.longitude);
+            if (!isNaN(lat) && !isNaN(lon)) {
+                const marker = L.marker([lat, lon]).addTo(mapRef.current);
+                marker.bindPopup(`<b>${vendor.nama}</b>`);
+                markersRef.current.push(marker);
+            }
+        });
+
         return () => {
             if (mapRef.current) {
                 mapRef.current.remove();
                 mapRef.current = null;
             }
         };
-    }, [center, zoom, onLocationSelect]);
-
-    // Effect to update vendor markers on the map whenever the vendors prop changes
-    useEffect(() => {
-        if (!mapRef.current) return;
-        // Remove existing vendor markers
-        markersRef.current.forEach((marker) => marker.remove());
-        markersRef.current = [];
-
-        vendors.forEach((vendor) => {
-            const lat = parseFloat(vendor.lat);
-            const lon = parseFloat(vendor.lon);
-            if (!lat || !lon) return;
-            const vendorMarker = L.marker([lat, lon], {
-                icon: L.divIcon({
-                    className: "custom-marker",
-                    html: `<div class="marker-pin"></div>`,
-                    iconSize: [30, 42],
-                    iconAnchor: [15, 42],
-                }),
-            }).addTo(mapRef.current);
-
-            const popupContent = `
-                <div class="modern-popup">
-                    <div class="popup-header" style="background-image: url('${
-                        vendor.image || ""
-                    }')">
-                        ${vendor.image ? "" : '<div class="no-image">📍</div>'}
-                    </div>
-                    <div class="popup-content">
-                        <h3>${vendor.name || "Vendor Location"}</h3>
-                        <p class="address">${
-                            vendor.address || "Vendor address will be shown here"
-                        }</p>
-                        ${
-                            vendor.date || vendor.time
-                                ? `
-                            <div class="event-details">
-                                ${
-                                    vendor.date
-                                        ? `<div class="detail-item"><i class="far fa-calendar"></i>${vendor.date}</div>`
-                                        : ""
-                                }
-                                ${
-                                    vendor.time
-                                        ? `<div class="detail-item"><i class="far fa-clock"></i>${vendor.time}</div>`
-                                        : ""
-                                }
-                            </div>
-                        `
-                                : ""
-                        }
-                        ${
-                            vendor.directions
-                                ? `
-                            <a href="${vendor.directions}" target="_blank" class="directions-btn">
-                                <i class="fas fa-directions"></i> Directions
-                            </a>
-                        `
-                                : ""
-                        }
-                    </div>
-                </div>
-            `;
-            vendorMarker.bindPopup(popupContent, {
-                className: "modern-popup-container",
-                maxWidth: 320,
-                minWidth: 280,
-            });
-            markersRef.current.push(vendorMarker);
-        });
-    }, [vendors]);
+    }, [vendors, center, zoom, onLocationSelect]);
 
     return (
         <div className="relative w-full">

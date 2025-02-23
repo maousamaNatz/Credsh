@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('phone_number')->nullable(); // Tambahan
+            $table->string('address')->nullable(); // Tambahan
             $table->string('google_id')->nullable();
             $table->string('password');
             $table->timestamp('email_verified_at')->nullable();
@@ -46,9 +48,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('reporter_id')->constrained('users');
             $table->foreignId('reported_id')->constrained('users');
-            $table->string('type'); // ['user', 'vendor', 'content']
+            $table->string('type');
             $table->text('description');
-            $table->string('status')->default('pending'); // ['pending', 'investigating', 'resolved']
+            $table->string('status')->default('pending');
             $table->text('resolution')->nullable();
             $table->timestamps();
 

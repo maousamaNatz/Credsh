@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Inertia\Inertia;
 use App\Models\Order;
+use App\Models\Vendor;
 use App\Models\Comment;
 use App\Models\Product;
 use App\Models\Category;
@@ -57,8 +58,7 @@ class ProductController extends Controller
             ]);
 
             $user = auth()->user();
-            $validated['vendor_id'] = $user->id;
-            $validated['vendor_name'] = $user->name;
+            $validated['vendor_id'] = $user->id; // Menggunakan vendor_id dari user yang sedang login
             $validated['slug'] = Str::slug($validated['nama']);
 
             // Perbaikan: Encode array gambar ke JSON
@@ -90,15 +90,21 @@ class ProductController extends Controller
                 'Anda tidak memiliki akses untuk membuat product.'
             );
     }
+
     /**
      * Tampilkan detail product tertentu.
      */
     public function show(string $slug)
     {        $product = Product::where('slug', $slug)->firstOrFail();
 
+        $vendor = Vendor::where('user_id', $product->vendor_id)->firstOrFail();
+        $comments = Comment::where('product_id', $product->id)->get();
+
         // Pastikan gambar dapat diakses
         return Inertia::render('Vendors/Products/Show', [
             'product' => $product,
+            'vendor' => $vendor,
+            'comments' => $comments,
         ]);
     }
 

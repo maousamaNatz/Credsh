@@ -6,7 +6,7 @@ import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
 const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZ3JhbW1hdGEiLCJhIjoiY2wxMzI4b3dqMDNhMjNpcDhzcmU0aGh5diJ9.m1lacx48pTYls-X3FVhG9g";
 
-const ProfileMap = ({ latitude = -6.2, longitude = 106.816666, zoom = 13, onLocationChange, search, setSearch, setVendorData, vendorData }) => {
+const ProfileMap = ({ latitude = -6.2, longitude = 106.816666, zoom = 13, onLocationChange, search, setSearch, setVendorData, vendorData, venues }) => {
   const mapRef = useRef(null);
   const markerRef = useRef(null);
   const [suggestions, setSuggestions] = useState([]);
@@ -60,11 +60,24 @@ const ProfileMap = ({ latitude = -6.2, longitude = 106.816666, zoom = 13, onLoca
       });
     });
 
+    // Tambahkan marker untuk setiap vendor
+    venues.forEach(venue => {
+      if (venue.latitude && venue.longitude) {
+        const marker = L.marker([parseFloat(venue.latitude), parseFloat(venue.longitude)])
+          .bindPopup(`
+            <b>${venue.nama}</b><br>
+            ${venue.alamat}<br>
+            Kategori: ${venue.kategori}
+          `);
+        marker.addTo(map);
+      }
+    });
+
     return () => {
       map.remove();
       mapRef.current = null;
     };
-  }, [latitude, longitude, zoom, onLocationChange, setVendorData]);
+  }, [latitude, longitude, zoom, onLocationChange, setVendorData, venues]);
 
   useEffect(() => {
     if (search) {
@@ -168,7 +181,6 @@ const ProfileMap = ({ latitude = -6.2, longitude = 106.816666, zoom = 13, onLoca
 
   return (
     <div className="w-full">
-
       <div id="profile-map" style={{ width: "100%", height: "400px" }}></div>
     </div>
   );
