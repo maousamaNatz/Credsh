@@ -3,6 +3,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
+import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
 
 const MAPBOX_ACCESS_TOKEN = "pk.eyJ1IjoiZ3JhbW1hdGEiLCJhIjoiY2wxMzI4b3dqMDNhMjNpcDhzcmU0aGh5diJ9.m1lacx48pTYls-X3FVhG9g";
 
@@ -61,7 +62,8 @@ const ProfileMap = ({ latitude = -6.2, longitude = 106.816666, zoom = 13, onLoca
     });
 
     // Tambahkan marker untuk setiap vendor
-    venues.forEach(venue => {
+    const validMarkers = venues || [];
+    validMarkers.forEach(venue => {
       if (venue.latitude && venue.longitude) {
         const marker = L.marker([parseFloat(venue.latitude), parseFloat(venue.longitude)])
           .bindPopup(`
@@ -178,6 +180,17 @@ const ProfileMap = ({ latitude = -6.2, longitude = 106.816666, zoom = 13, onLoca
       console.error("Geolocation tidak didukung oleh browser Anda.");
     }
   };
+
+  // Fix marker icons
+  L.Marker.prototype.options.icon = L.icon({
+    iconUrl: markerIcon,
+    iconRetinaUrl: markerIcon2x,
+    shadowUrl: markerShadow,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41]
+  });
 
   return (
     <div className="w-full">

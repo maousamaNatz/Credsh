@@ -42,6 +42,25 @@ return new class extends Migration {
             $table->integer('quantity');
             $table->timestamps();
         });
+
+        Schema::create('transactions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('vendor_id')->constrained('vendors');
+            $table->foreignId('product_id')->constrained('products');
+            $table->integer('quantity');
+            $table->decimal('amount', 15, 2);
+            $table->enum('status', ['pending', 'success', 'failed', 'dispute'])->default('pending');
+            $table->string('payment_method');
+            $table->decimal('commission_rate', 5, 2)->default(0);
+            $table->decimal('commission_amount', 15, 2)->default(0);
+            $table->boolean('escrow_released')->default(false);
+            $table->foreignId('reference_id')->nullable(); // Bisa mengacu ke booking_id
+            $table->dateTime('transaction_date');
+            $table->timestamps();
+            $table->index('status');
+            $table->index('transaction_date');
+        });
     }
 
     public function down()
@@ -49,5 +68,6 @@ return new class extends Migration {
         Schema::dropIfExists('products');
         Schema::dropIfExists('comments');
         Schema::dropIfExists('cart');
+        Schema::dropIfExists('transactions');
     }
 };

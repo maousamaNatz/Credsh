@@ -11,6 +11,7 @@ use App\Http\Controllers\RatingController;
 use App\Http\Controllers\SearchController;
 use App\Http\Controllers\VendorController;
 use App\Http\Controllers\BookingController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\DashboardController;
@@ -37,6 +38,22 @@ Route::middleware('guest')->group(function () {
 
 Route::middleware('auth')->group(function () {
 
+        // Membuat transaksi baru
+    Route::post('/transactions', [TransactionController::class, 'store'])
+    ->name('transactions.store');
+
+    // Halaman pembayaran
+    Route::get('/transactions/{transaction}/payment', [TransactionController::class, 'payment'])
+        ->name('transactions.payment');
+
+    // Halaman invoice
+    Route::get('/transactions/{transaction}/invoice', [TransactionController::class, 'invoice'])
+        ->name('transactions.invoice');
+
+    // Riwayat transaksi
+    Route::get('/transactions/history', [TransactionController::class, 'history'])
+        ->name('transactions.history');
+
     Route::get('/payments/{product_slug}', [TransactionController::class, 'index'])->name('payments.payment');
     Route::post('/payments/{transaction}', [TransactionController::class, 'payment'])->name('payments.payments');
 
@@ -58,6 +75,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/transactions/payment/{product_slug}', [TransactionController::class, 'index'])->name('transactions.payment');
     Route::post('/transactions', [TransactionController::class, 'store'])->name('transactions.store');
     Route::get('/transactions/invoice/{transaction}', [TransactionController::class, 'invoice'])->name('transactions.invoice');
+
+    // Di dalam group auth
+    Route::post('/transactions/{transaction}/process', [TransactionController::class, 'process'])
+        ->name('transactions.process');
 });
 
 // Route untuk semua user yang terautentikasi
@@ -112,5 +133,18 @@ Route::get('/products/{product:slug}', [ProductController::class, 'show'])->name
 
 // Tambahkan route untuk vendors.show
 Route::get('/vendors/{vendor}', [VendorController::class, 'show'])->name('vendors.show');
+
+Route::get('view/vendor', function () {
+    return Inertia::render('Vendor/ViewVendor');
+});
+
+Route::get('/transactions/{transaction_id}/payment', [TransactionController::class, 'payment'])
+    ->name('transactions.payment');
+
+Route::post('/comments', [CommentController::class, 'store'])->name('comments.store');
+Route::delete('/comments/{comment}', [CommentController::class, 'destroy'])->name('comments.destroy');
+Route::get('/browse', function () {
+    return Inertia::render('browse');
+});
 
 require __DIR__ . '/auth.php';

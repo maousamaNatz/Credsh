@@ -276,13 +276,16 @@ export default function VendorProfile({ auth, vendor, products = [], analytics }
                     <div className="mt-6">
                         <h3 className="text-2xl font-bold text-gray-900 mb-4">Lokasi Vendor</h3>
                         <LeafletMap
-                            center={vendorData.location ? [vendorData.location.lat, vendorData.location.lng] : [-6.2, 106.816666]}
-                            zoom={vendorData.location ? 15 : 13}
+                            center={vendorData.latitude && vendorData.longitude ?
+                                [vendorData.latitude, vendorData.longitude] :
+                                [-6.2, 106.816666]}
+                            zoom={15}
                             venue={{
-                                name: vendorData.name,
-                                address: vendorData.address || 'Alamat belum diatur',
-                                image: vendorData.avatar || '/images/default-avatar.png'
+                                name: vendorData.nama || auth.user.name,
+                                address: `${vendorData.alamat || ''}, ${vendorData.kabupaten || ''}, ${vendorData.kota || ''}`,
+                                image: auth.user.avatar || '/images/default-avatar.png'
                             }}
+                            markers={[]}
                         />
                     </div>
                 </div>

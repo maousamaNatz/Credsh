@@ -9,6 +9,8 @@ class Transaction extends Model
     protected $fillable = [
         'user_id',
         'vendor_id',
+        'product_id',
+        'quantity',
         'amount',
         'status', // ['pending', 'completed', 'failed', 'refunded']
         'payment_method',
@@ -26,5 +28,10 @@ class Transaction extends Model
     public function vendor()
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
     }
 }

@@ -11,6 +11,7 @@ export default function HomePage({
   latestArticles,
   mapsVendors = [],
   products = [],
+  auth,
 }) {
   // Fungsi handle location select (jika diperlukan)
   const handleLocationSelect = (location) => {
@@ -99,19 +100,22 @@ export default function HomePage({
           </div>
         </div>
       </section>
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-semibold text-center mb-12">
-          Produk Terbaru
-        </h2>
-        <ReloadCard items={products} />
-      </div>
 
-
-      {/* Map Section */}
+      {/* Produk Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-semibold text-center mb-12">
-            Lokasi Kami
+            Produk Terbaru
+          </h2>
+          <ReloadCard items={products} />
+        </div>
+      </section>
+
+      {/* Map Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-semibold text-center mb-12">
+            Lokasi Vendor
           </h2>
           {mapsVendors.length > 0 ? (
             <MapComponent
@@ -129,20 +133,22 @@ export default function HomePage({
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-red-600">
-        <div className="container mx-auto px-4 text-center text-white">
-          <h2 className="text-3xl font-semibold mb-6">
-            Siap Merencanakan Pernikahan?
-          </h2>
-          <p className="text-xl mb-8">Mulai perjalanan indahmu bersama kami</p>
-          <Link
-            href="/register"
-            className="bg-white text-red-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300"
-          >
-            Daftar Sekarang
-          </Link>
-        </div>
-      </section>
+      {!auth?.user && (
+        <section className="py-16 bg-red-600">
+          <div className="container mx-auto px-4 text-center text-white">
+            <h2 className="text-3xl font-semibold mb-6">
+              Siap Merencanakan Pernikahan?
+            </h2>
+            <p className="text-xl mb-8">Mulai perjalanan indahmu bersama kami</p>
+            <Link
+              href="/register"
+              className="bg-white text-red-600 px-8 py-3 rounded-lg text-lg hover:bg-gray-100 transition duration-300"
+            >
+              Daftar Sekarang
+            </Link>
+          </div>
+        </section>
+      )}
     </Layout>
   )
 }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Vendor;
+use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -116,7 +117,6 @@ class DatabaseSeeder extends Seeder
                 'status' => true,
                 'rating' => 4.8
             ],
-            // ... tambahkan vendor lainnya
         ];
 
         foreach ($vendors as $vendor) {
@@ -133,11 +133,11 @@ class DatabaseSeeder extends Seeder
             ['nama' => 'Hiburan', 'deskripsi' => 'Penyedia hiburan untuk menambah keseruan acara pernikahan.'],
             ['nama' => 'Venue', 'deskripsi' => 'Tempat pernikahan yang elegan dan nyaman.'],
             ['nama' => 'Undangan', 'deskripsi' => 'Desain undangan pernikahan yang unik dan menarik.'],
-            // ... tambahkan kategori lainnya jika diperlukan
         ];
 
         foreach ($categories as $category) {
             Category::create($category);
         }
+
     }
 }

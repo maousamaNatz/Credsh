@@ -149,9 +149,9 @@ export function SearchBar() {
                                                 <div className="text-sm font-medium text-gray-900 truncate">
                                                     {product.nama}
                                                 </div>
-                                                <div className="text-xs text-gray-500 mt-1 truncate">
-                                                    {product.deskripsi}
-                                                </div>
+                                                <div className="text-xs text-gray-500 mt-1 truncate"dangerouslySetInnerHTML={{
+                                                    __html: product.deskripsi || 'Deskripsi produk tidak tersedia.',
+                                                }} />
                                             </Link>
                                         ))}
                                     </div>

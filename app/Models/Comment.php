@@ -13,8 +13,9 @@ class Comment extends Model
     protected $fillable = [
         'user_id',
         'product_id',
+        'rating',
         'komentar',
-        'rating'
+        'status'
     ];
 
     public function user()
@@ -25,5 +26,14 @@ class Comment extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    // Cek apakah user sudah membeli produk
+    public static function hasPurchased($userId, $productId)
+    {
+        return Transaction::where('user_id', $userId)
+            ->where('product_id', $productId)
+            ->where('status', 'success')
+            ->exists();
     }
 }

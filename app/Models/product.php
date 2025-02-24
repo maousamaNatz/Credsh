@@ -33,7 +33,7 @@ class Product extends Model
     // Relasi ke tabel User (Vendor)
     public function vendor()
     {
-        return $this->belongsTo(User::class, 'vendor_id'); // Mengganti user_id dengan vendor_id
+        return $this->belongsTo(Vendor::class);
     }
 
     public function getGambarUrlAttribute()

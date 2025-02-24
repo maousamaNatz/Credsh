@@ -55,5 +55,17 @@ class VendorController extends Controller
         // ... existing code ...
     }
 
-    // ... other methods ...
+    public function show($id)
+    {
+        $vendor = Vendor::findOrFail($id);
+        $products = Product::where('vendor_id', $id)->get();
+        $articles = Article::where('vendor_id', $id)->get();
+
+        return Inertia::render('Vendor/ViewVendor', [
+            'vendor' => $vendor,
+            'products' => $products
+        ]);
+    }
+
+
 }

@@ -95,16 +95,23 @@ class ProductController extends Controller
      * Tampilkan detail product tertentu.
      */
     public function show(string $slug)
-    {        $product = Product::where('slug', $slug)->firstOrFail();
+    {
+        $product = Product::where('slug', $slug)
+            ->with(['comments.user', 'vendor'])
+            ->firstOrFail();
 
-        $vendor = Vendor::where('user_id', $product->vendor_id)->firstOrFail();
-        $comments = Comment::where('product_id', $product->id)->get();
+        $canComment = Comment::hasPurchased(Auth::id(), $product->id);
+        $averageRating = $product->comments()->avg('rating');
 
-        // Pastikan gambar dapat diakses
         return Inertia::render('Vendors/Products/Show', [
             'product' => $product,
-            'vendor' => $vendor,
-            'comments' => $comments,
+            'vendor' => $product->vendor,
+            'canComment' => $canComment,
+            'averageRating' => round($averageRating, 1),
+            'comments' => $product->comments()
+                ->with('user')
+                ->latest()
+                ->paginate(10)
         ]);
     }
 
